@@ -17,4 +17,8 @@ class SignInViewModel: ObservableObject {
     func navigateToRegister() {
         self.router.routeToRegister()
     }
+
+    func navigateToForgotPassword() {
+        self.router.routeToForgotPassword()
+    }
 }

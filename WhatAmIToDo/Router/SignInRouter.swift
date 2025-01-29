@@ -44,3 +44,9 @@ extension SignInRouter {
     static let mock: SignInRouter = .init(rootCoordinator: AppRouter())
 }
 
+extension SignInRouter {
+    func routeToForgotPassword() {
+        let router = ForgotPasswordRouter(rootCoordinator: self.rootCoordinator)
+        rootCoordinator.push(router)
+    }
+}

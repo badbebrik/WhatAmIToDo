@@ -16,7 +16,7 @@ struct SignInView: View {
     @State var isPasswordHidden: Bool = true
 
     var body: some View {
-        VStack {
+        VStack(spacing: 20) {
             Text("WhatAmIToDo")
                 .font(.largeTitle)
                 .fontWeight(.bold)
@@ -49,7 +49,7 @@ struct SignInView: View {
             .overlay(RoundedRectangle(cornerRadius: 8).stroke(Color.gray.opacity(0.5), lineWidth: 1))
 
             Button {
-
+                viewModel.navigateToForgotPassword()
             } label: {
                 Text("Forgot password?")
                     .frame(maxWidth: .infinity, alignment: .trailing)

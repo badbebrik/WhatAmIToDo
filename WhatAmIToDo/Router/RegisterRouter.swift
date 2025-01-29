@@ -9,7 +9,7 @@ import SwiftUI
 
 class RegisterRouter {
     private let rootCoordinator: NavigationCoordinator
-    
+
     init(rootCoordinator: NavigationCoordinator) {
         self.rootCoordinator = rootCoordinator
     }
@@ -27,9 +27,9 @@ extension RegisterRouter {
     static func == (lhs: RegisterRouter, rhs: RegisterRouter) -> Bool {
         return false
     }
-    
+
     func hash(into hasher: inout Hasher) {
-    
+
     }
 }
 

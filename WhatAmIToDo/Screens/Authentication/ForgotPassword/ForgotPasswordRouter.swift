@@ -41,4 +41,9 @@ extension ForgotPasswordRouter {
     func pop() {
         rootCoordinator.popLast()
     }
+
+    func routeToVerifyCode() {
+        let router = VerifyCodeRouter(rootCoordinator: self.rootCoordinator)
+        rootCoordinator.push(router)
+    }
 }

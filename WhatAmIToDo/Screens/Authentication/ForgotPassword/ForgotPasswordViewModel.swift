@@ -14,7 +14,11 @@ class ForgotPasswordViewModel: ObservableObject {
         self.router = router
     }
 
-    func onBackTapped() {
+    func navigateBack() {
         self.router.pop()
+    }
+
+    func navigateToVerifyCode() {
+        self.router.routeToVerifyCode()
     }
 }

@@ -23,13 +23,15 @@ struct ForgotPasswordView: View {
                 .foregroundStyle(.gray)
                 .frame(maxWidth: .infinity, alignment: .leading)
 
+
             TextField("Email", text: $email)
                 .keyboardType(.emailAddress)
                 .autocorrectionDisabled()
                 .padding()
                 .overlay(RoundedRectangle(cornerRadius: 8).stroke(Color.gray.opacity(0.5), lineWidth: 1))
+                .padding(.top, 20)
             Button {
-
+                viewModel.navigateToVerifyCode()
             } label: {
                 Text("Send code")
                     .foregroundStyle(.white)
@@ -38,13 +40,14 @@ struct ForgotPasswordView: View {
                     .background(.black)
                     .cornerRadius(8)
             }
+            .padding(.top, 20)
         }
         .padding()
         .navigationBarBackButtonHidden()
         .toolbar {
             ToolbarItem(placement: .topBarLeading) {
                 Button {
-                    viewModel.onBackTapped()
+                    viewModel.navigateBack()
                 } label: {
                     Image(systemName: "chevron.left")
                 }

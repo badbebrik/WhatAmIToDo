@@ -58,9 +58,9 @@ struct VerifyCodeView: View {
             }
             .frame(maxWidth: .infinity, alignment: .center)
 
-            Button(action: {
-                
-            }) {
+            Button {
+                viewModel.navigateToNewPassword()
+            } label: {
                 Text("Verify")
                     .foregroundColor(.white)
                     .padding()

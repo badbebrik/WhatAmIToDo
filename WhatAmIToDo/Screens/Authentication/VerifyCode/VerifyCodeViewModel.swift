@@ -17,4 +17,8 @@ class VerifyCodeViewModel: ObservableObject {
     func navigateBack() {
         self.router.pop()
     }
+
+    func navigateToNewPassword() {
+        self.router.routeToNewPassword()
+    }
 }

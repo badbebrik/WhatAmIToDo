@@ -41,4 +41,9 @@ extension VerifyCodeRouter {
     func pop() {
         self.rootCoordinator.popLast()
     }
+
+    func routeToNewPassword() {
+        let router = NewPasswordRouter(rootCoordinator: self.rootCoordinator)
+        rootCoordinator.push(router)
+    }
 }

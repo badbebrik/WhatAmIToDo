@@ -23,7 +23,6 @@ struct ForgotPasswordView: View {
                 .foregroundStyle(.gray)
                 .frame(maxWidth: .infinity, alignment: .leading)
 
-
             TextField("Email", text: $email)
                 .keyboardType(.emailAddress)
                 .autocorrectionDisabled()

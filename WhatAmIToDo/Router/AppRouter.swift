@@ -9,7 +9,7 @@ import SwiftUI
 
 class AppRouter: ObservableObject {
     @Published var paths = NavigationPath()
-    
+
     func resolveInitialRouter() -> any Routable {
         // TODO: resolving depending on the auth user state
         let signInRouter = SignInRouter(rootCoordinator: self)
@@ -20,7 +20,8 @@ class AppRouter: ObservableObject {
 extension AppRouter: NavigationCoordinator {
     func push(_ router: any Routable) {
         DispatchQueue.main.async {
-            self.paths.append(router)
+            let wrappedRouter = AnyRoutable(router)
+            self.paths.append(wrappedRouter)
         }
     }
     func popLast() {

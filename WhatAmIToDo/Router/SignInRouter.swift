@@ -13,6 +13,11 @@ class SignInRouter {
     init(rootCoordinator: NavigationCoordinator) {
         self.rootCoordinator = rootCoordinator
     }
+
+    func routeToRegister() {
+        let router = RegisterRouter(rootCoordinator: self.rootCoordinator)
+        rootCoordinator.push(router)
+    }
 }
 
 // MARK: Hashable implementation
@@ -29,7 +34,7 @@ extension SignInRouter: Routable {
 // MARK: ViewFactory implementation
 extension SignInRouter {
     func makeView() -> AnyView {
-        let viewModel = SignInViewModel()
+        let viewModel = SignInViewModel(router: self)
         let view = SignInView(viewModel: viewModel)
         return AnyView(view)
     }

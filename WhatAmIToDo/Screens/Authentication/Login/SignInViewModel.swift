@@ -8,5 +8,13 @@
 import Foundation
 
 class SignInViewModel: ObservableObject {
-    
+    private let router: SignInRouter
+
+    init(router: SignInRouter) {
+        self.router = router
+    }
+
+    func navigateToRegister() {
+        self.router.routeToRegister()
+    }
 }

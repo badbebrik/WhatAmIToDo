@@ -15,9 +15,12 @@ struct SignInView: View {
         Text("SignInView")
             .font(.largeTitle)
             .fontWeight(.bold)
+        Button("To Register") {
+            viewModel.navigateToRegister()
+        }
     }
 }
 
 #Preview {
-    SignInView(viewModel: .init())
+    SignInView(viewModel: .init(router: SignInRouter.mock))
 }

@@ -14,6 +14,9 @@ struct AppNavigationView: View {
     var body: some View {
         NavigationStack(path: $appRouter.paths) {
             appRouter.resolveInitialRouter().makeView()
+                .navigationDestination(for: AnyRoutable.self) { router in
+                    router.makeView()
+                }
         }
     }
 }

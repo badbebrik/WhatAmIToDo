@@ -35,3 +35,7 @@ extension SignInRouter {
     }
 }
 
+extension SignInRouter {
+    static let mock: SignInRouter = .init(rootCoordinator: AppRouter())
+}
+

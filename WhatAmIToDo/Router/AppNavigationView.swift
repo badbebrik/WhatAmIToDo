@@ -13,7 +13,7 @@ struct AppNavigationView: View {
 
     var body: some View {
         NavigationStack(path: $appRouter.paths) {
-            // Views will be resolved here
+            appRouter.resolveInitialRouter().makeView()
         }
     }
 }

@@ -9,6 +9,12 @@ import SwiftUI
 
 class AppRouter: ObservableObject {
     @Published var paths = NavigationPath()
+    
+    func resolveInitialRouter() -> any Routable {
+        // TODO: resolving depending on the auth user state
+        let signInRouter = SignInRouter(rootCoordinator: self)
+        return signInRouter
+    }
 }
 
 extension AppRouter: NavigationCoordinator {

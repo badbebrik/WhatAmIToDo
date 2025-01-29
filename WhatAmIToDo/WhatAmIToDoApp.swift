@@ -11,7 +11,7 @@ import SwiftUI
 struct WhatAmIToDoApp: App {
     var body: some Scene {
         WindowGroup {
-            ContentView()
+            AppNavigationView(appRouter: .init())
         }
     }
 }

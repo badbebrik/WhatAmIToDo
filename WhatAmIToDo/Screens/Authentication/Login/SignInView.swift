@@ -9,6 +9,8 @@ import SwiftUI
 
 struct SignInView: View {
 
+    @StateObject var viewModel: SignInViewModel
+
     var body: some View {
         Text("SignInView")
             .font(.largeTitle)
@@ -17,5 +19,5 @@ struct SignInView: View {
 }
 
 #Preview {
-    SignInView()
+    SignInView(viewModel: .init())
 }

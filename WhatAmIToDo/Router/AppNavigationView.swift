@@ -8,9 +8,9 @@
 import SwiftUI
 
 struct AppNavigationView: View {
-    
+
     @StateObject var appRouter: AppRouter
-    
+
     var body: some View {
         NavigationStack(path: $appRouter.paths) {
             // Views will be resolved here

@@ -69,7 +69,7 @@ struct SignInView: View {
             HStack {
                 Text("Don't have an account?")
                 Button {
-
+                    viewModel.navigateToRegister()
                 } label: {
                     Text("Sign Up")
                 }

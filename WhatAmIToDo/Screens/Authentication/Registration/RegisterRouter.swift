@@ -13,6 +13,14 @@ class RegisterRouter {
     init(rootCoordinator: NavigationCoordinator) {
         self.rootCoordinator = rootCoordinator
     }
+
+    func routeToRegistrationSuccess() {
+        rootCoordinator.popToRoot()
+    }
+
+    func routeBack() {
+        rootCoordinator.popLast()
+    }
 }
 
 extension RegisterRouter: Routable {

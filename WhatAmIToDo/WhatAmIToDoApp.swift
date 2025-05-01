@@ -10,9 +10,13 @@ import GoogleSignInSwift
 
 @main
 struct WhatAmIToDoApp: App {
+
+    @StateObject var session = SessionManager.shared
+
     var body: some Scene {
         WindowGroup {
             AppNavigationView(appRouter: .init())
+                .environmentObject(session)
         }
     }
 }

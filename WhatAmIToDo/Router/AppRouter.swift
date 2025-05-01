@@ -10,10 +10,16 @@ import SwiftUI
 class AppRouter: ObservableObject {
     @Published var paths = NavigationPath()
 
-    func resolveInitialRouter() -> any Routable {
-        // TODO: resolving depending on the auth user state
-        let signInRouter = SignInRouter(rootCoordinator: self)
-        return signInRouter
+    func resolveInitialRouter(isLoggedIn: Bool) -> any Routable {
+        if isLoggedIn {
+            print("isLoggedIn true")
+            let signInRouter = SignInRouter(rootCoordinator: self)
+            return signInRouter
+        } else {
+            let signInRouter = SignInRouter(rootCoordinator: self)
+            print("isLoggedIn false")
+            return signInRouter
+        }
     }
 }
 

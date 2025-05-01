@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import GoogleSignInSwift
 
 @main
 struct WhatAmIToDoApp: App {

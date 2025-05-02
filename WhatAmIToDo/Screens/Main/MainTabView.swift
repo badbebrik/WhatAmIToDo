@@ -18,9 +18,9 @@ struct MainTabView: View {
                     Label("Задачи", systemImage: "checklist")
                 }
             
-            Color.yellow
+            SettingsView()
                 .tabItem {
-                    Label("Профиль", systemImage: "person.fill")
+                    Label("Настройки", systemImage: "gear")
                 }
         }
     }

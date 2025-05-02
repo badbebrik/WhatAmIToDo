@@ -17,6 +17,7 @@ struct AppNavigationView: View {
             appRouter.resolveInitialRouter(isLoggedIn: session.isLoggedIn).makeView()
                 .navigationDestination(for: AnyRoutable.self) { router in
                     router.makeView()
+                    
                 }
         }
     }

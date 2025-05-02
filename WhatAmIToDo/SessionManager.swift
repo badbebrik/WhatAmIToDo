@@ -14,11 +14,11 @@ import GoogleSignIn
 final class SessionManager: ObservableObject {
     static let shared = SessionManager()
 
-    @Published private(set) var user: UserResponse?
-    @Published private(set) var isLoggedIn = false
+    @Published var user: UserResponse?
+    @Published var isLoggedIn = false
 
-    private let network = NetworkManager.shared
-    private let keychain = KeychainManager.shared
+    let network = NetworkManager.shared
+    let keychain = KeychainManager.shared
 
     private init() {
         // Если есть refresh-токен, пытаемся обновить сессию

@@ -16,7 +16,7 @@ struct WhatAmIToDoApp: App {
     var body: some Scene {
         WindowGroup {
             AppNavigationView(appRouter: .init())
-                .environmentObject(session)
         }
+        .environmentObject(session)
     }
 }

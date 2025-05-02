@@ -33,8 +33,8 @@ extension SignInRouter: Routable {
 
 // MARK: ViewFactory implementation
 extension SignInRouter {
-    func makeView() -> AnyView {
-        let viewModel = SignInViewModel(router: self)
+    @MainActor func makeView() -> AnyView {
+        let viewModel = SignInViewModel(router: self, session: SessionManager.shared)
         let view = SignInView(viewModel: viewModel)
         return AnyView(view)
     }

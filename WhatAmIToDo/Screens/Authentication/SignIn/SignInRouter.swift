@@ -33,8 +33,8 @@ extension SignInRouter: Routable {
 
 // MARK: ViewFactory implementation
 extension SignInRouter {
-    func makeView() -> AnyView {
-        let viewModel = SignInViewModel(router: self)
+    @MainActor func makeView() -> AnyView {
+        let viewModel = SignInViewModel(router: self, session: SessionManager.shared)
         let view = SignInView(viewModel: viewModel)
         return AnyView(view)
     }
@@ -47,6 +47,13 @@ extension SignInRouter {
 extension SignInRouter {
     func routeToForgotPassword() {
         let router = ForgotPasswordRouter(rootCoordinator: self.rootCoordinator)
+        rootCoordinator.push(router)
+    }
+}
+
+extension SignInRouter {
+    func routeToMain() {
+        let router = MainRouter(rootCoordinator: self.rootCoordinator)
         rootCoordinator.push(router)
     }
 }

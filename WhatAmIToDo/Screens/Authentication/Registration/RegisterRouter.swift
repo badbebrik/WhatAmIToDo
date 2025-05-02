@@ -21,11 +21,16 @@ class RegisterRouter {
     func routeBack() {
         rootCoordinator.popLast()
     }
+
+    func routeToMain() {
+        let router = MainRouter(rootCoordinator: self.rootCoordinator)
+        rootCoordinator.push(router)
+    }
 }
 
 extension RegisterRouter: Routable {
-    func makeView() -> AnyView {
-        let viewModel = RegisterViewModel(router: self)
+    @MainActor func makeView() -> AnyView {
+        let viewModel = RegisterViewModel(router: self, session: SessionManager.shared)
         let view = RegisterView(viewModel: viewModel)
         return AnyView(view)
     }

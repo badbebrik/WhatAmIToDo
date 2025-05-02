@@ -9,15 +9,28 @@ import SwiftUI
 
 class RegisterRouter {
     private let rootCoordinator: NavigationCoordinator
-    
+
     init(rootCoordinator: NavigationCoordinator) {
         self.rootCoordinator = rootCoordinator
+    }
+
+    func routeToRegistrationSuccess() {
+        rootCoordinator.popToRoot()
+    }
+
+    func routeBack() {
+        rootCoordinator.popLast()
+    }
+
+    func routeToMain() {
+        let router = MainRouter(rootCoordinator: self.rootCoordinator)
+        rootCoordinator.push(router)
     }
 }
 
 extension RegisterRouter: Routable {
-    func makeView() -> AnyView {
-        let viewModel = RegisterViewModel(router: self)
+    @MainActor func makeView() -> AnyView {
+        let viewModel = RegisterViewModel(router: self, session: SessionManager.shared)
         let view = RegisterView(viewModel: viewModel)
         return AnyView(view)
     }
@@ -27,9 +40,9 @@ extension RegisterRouter {
     static func == (lhs: RegisterRouter, rhs: RegisterRouter) -> Bool {
         return false
     }
-    
+
     func hash(into hasher: inout Hasher) {
-    
+
     }
 }
 

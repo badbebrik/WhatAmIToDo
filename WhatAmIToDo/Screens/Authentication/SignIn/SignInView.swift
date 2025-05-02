@@ -23,7 +23,7 @@ struct SignInView: View {
                 .font(.largeTitle)
                 .fontWeight(.bold)
 
-            TextField("Email", text: $email)
+            TextField("Email", text: $viewModel.email)
                 .keyboardType(.emailAddress)
                 .autocorrectionDisabled()
                 .padding()

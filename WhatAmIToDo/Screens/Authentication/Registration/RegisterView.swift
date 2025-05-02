@@ -33,9 +33,10 @@ struct RegisterView: View {
         .navigationBarBackButtonHidden()
         .tabViewStyle(.page)
         .indexViewStyle(.page(backgroundDisplayMode: .always))
+        .overlay { if viewModel.isLoading { ProgressView().scaleEffect(1.4) } }
+        .alert(item: $viewModel.alert) {
+            Alert(title: Text("Error"), message: Text($0.message), dismissButton: .default(Text("OK")))
+        }
     }
 }
 
-#Preview {
-    RegisterView(viewModel: .init(router: RegisterRouter.mock))
-}

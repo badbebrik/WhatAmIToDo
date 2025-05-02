@@ -48,14 +48,14 @@ enum Endpoint {
     /// URL-путь (относительно baseURL)
     var path: String {
         switch self {
-        case .googleLogin:          return "/auth/google"
-        case .login:                return "/auth/login"
-        case .signup:               return "/auth/signup"
-        case .sendVerificationCode: return "/auth/send-code"
-        case .verifyCode:           return "/auth/verify"
-        case .refresh:              return "/auth/refresh"
-        case .logout:               return "/auth/logout"
-        case .getMe:                return "/auth/me"
+        case .googleLogin:          return "/api/auth/google"
+        case .login:                return "/api/auth/login"
+        case .signup:               return "/api/auth/signup"
+        case .sendVerificationCode: return "/api/auth/send-code"
+        case .verifyCode:           return "/api/auth/verify-email"
+        case .refresh:              return "/api/auth/refresh"
+        case .logout:               return "/api/auth/logout"
+        case .getMe:                return "/api/auth/me"
         }
     }
 
@@ -138,7 +138,7 @@ enum Endpoint {
 @MainActor
 final class NetworkManager {
     static let shared = NetworkManager()
-    private let baseURL = URL(string: "https://api.yourdomain.com")!
+    private let baseURL = URL(string: "http://localhost:8080")!
     private let session: URLSession
     private var isRefreshing = false
 
@@ -164,8 +164,22 @@ final class NetworkManager {
     }
 
     private func perform(request: URLRequest, needsAuth: Bool) async throws -> Data {
+        print("Making request to: \(request.url?.absoluteString ?? "unknown URL")")
+        print("Method: \(request.httpMethod ?? "unknown")")
+        if let body = request.httpBody, let bodyString = String(data: body, encoding: .utf8) {
+            print("Request body: \(bodyString)")
+        }
+        
         let (data, resp) = try await session.data(for: request)
+        if let http = resp as? HTTPURLResponse {
+            print("Response status code: \(http.statusCode)")
+            if let responseString = String(data: data, encoding: .utf8) {
+                print("Response body: \(responseString)")
+            }
+        }
+        
         if let http = resp as? HTTPURLResponse, http.statusCode == 401, needsAuth {
+            print("Received 401, attempting to refresh token...")
             try await refreshToken()
             var retry = request
             if let newAT = KeychainManager.shared.getAccessToken() {

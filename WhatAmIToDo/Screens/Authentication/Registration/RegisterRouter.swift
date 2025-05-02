@@ -24,8 +24,8 @@ class RegisterRouter {
 }
 
 extension RegisterRouter: Routable {
-    func makeView() -> AnyView {
-        let viewModel = RegisterViewModel(router: self)
+    @MainActor func makeView() -> AnyView {
+        let viewModel = RegisterViewModel(router: self, session: SessionManager.shared)
         let view = RegisterView(viewModel: viewModel)
         return AnyView(view)
     }

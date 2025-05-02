@@ -1,6 +1,13 @@
 import SwiftUI
 
 struct MainTabView: View {
+
+    private let rootCoordinator: NavigationCoordinator
+
+    init(rootCoordinator: NavigationCoordinator) {
+        self.rootCoordinator = rootCoordinator
+    }
+
     var body: some View {
         TabView {
             MainView()
@@ -13,7 +20,7 @@ struct MainTabView: View {
                     Label("Календарь", systemImage: "calendar")
                 }
             
-            Color.green
+            GoalsView(viewModel: GoalsViewModel(router: GoalsRouter(rootCoordinator: rootCoordinator)))
                 .tabItem {
                     Label("Задачи", systemImage: "checklist")
                 }

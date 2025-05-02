@@ -17,15 +17,27 @@ final class KeychainManager {
     private let refreshKey = "refresh_token"
 
     func saveTokens(access: String, refresh: String) {
+        print("Saving tokens to keychain...")
         save(key: accessKey,  value: access)
         save(key: refreshKey, value: refresh)
+        print("Tokens saved successfully")
     }
-    func getAccessToken() -> String?  { read(key: accessKey) }
-    func getRefreshToken() -> String? { read(key: refreshKey) }
+    func getAccessToken() -> String?  { 
+        let token = read(key: accessKey)
+        print("Access token retrieved: \(token != nil ? "exists" : "nil")")
+        return token
+    }
+    func getRefreshToken() -> String? { 
+        let token = read(key: refreshKey)
+        print("Refresh token retrieved: \(token != nil ? "exists" : "nil")")
+        return token
+    }
 
     func clearTokens() {
+        print("Clearing tokens from keychain...")
         delete(key: accessKey)
         delete(key: refreshKey)
+        print("Tokens cleared successfully")
     }
 
     private func save(key: String, value: String) {

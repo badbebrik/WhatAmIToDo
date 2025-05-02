@@ -155,7 +155,9 @@ final class NetworkManager {
 
         do {
             let data = try await perform(request: req, needsAuth: endpoint.requiresAuth)
-            return try JSONDecoder().decode(T.self, from: data)
+            let decoder = JSONDecoder()
+            decoder.keyDecodingStrategy = .convertFromSnakeCase
+            return try decoder.decode(T.self, from: data)
         } catch let err as NetworkError {
             throw err
         } catch {

@@ -88,16 +88,32 @@ class RegisterViewModel: ObservableObject {
 
         isLoading = true; defer { isLoading = false }
         do {
+            print("Starting email verification request...")
             let resp: VerifyEmailResponse = try await session.network.request(
                 .verifyCode(email: email, code: code)
             )
+            print("Email verification successful, saving tokens...")
             session.keychain.saveTokens(access: resp.accessToken,
                                         refresh: resp.refreshToken)
             session.user = resp.user
             session.isLoggedIn = true
-            router.routeToRegistrationSuccess()
+            print("Tokens saved, navigating to main...")
+            router.routeToMain()
+        } catch let error as NetworkError {
+            print("Network error occurred: \(error)")
+            switch error {
+            case .invalidURL:
+                alert = .init(message: "Invalid server URL")
+            case .invalidResponse(let statusCode):
+                alert = .init(message: "Server error: \(statusCode)")
+            case .decodingError(let error):
+                alert = .init(message: "Data format error: \(error.localizedDescription)")
+            case .unknown(let error):
+                alert = .init(message: "Unknown error: \(error.localizedDescription)")
+            }
         } catch {
-            alert = .init(message: error.localizedDescription)
+            print("Unexpected error: \(error)")
+            alert = .init(message: "Unexpected error: \(error.localizedDescription)")
         }
     }
 

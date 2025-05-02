@@ -21,6 +21,11 @@ class RegisterRouter {
     func routeBack() {
         rootCoordinator.popLast()
     }
+
+    func routeToMain() {
+        let router = MainRouter(rootCoordinator: self.rootCoordinator)
+        rootCoordinator.push(router)
+    }
 }
 
 extension RegisterRouter: Routable {

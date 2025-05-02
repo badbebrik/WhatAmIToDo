@@ -50,3 +50,10 @@ extension SignInRouter {
         rootCoordinator.push(router)
     }
 }
+
+extension SignInRouter {
+    func routeToMain() {
+        let router = MainRouter(rootCoordinator: self.rootCoordinator)
+        rootCoordinator.push(router)
+    }
+}

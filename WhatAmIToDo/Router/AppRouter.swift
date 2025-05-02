@@ -11,13 +11,14 @@ class AppRouter: ObservableObject {
     @Published var paths = NavigationPath()
 
     func resolveInitialRouter(isLoggedIn: Bool) -> any Routable {
-        if isLoggedIn {
-            print("isLoggedIn true")
-            let signInRouter = SignInRouter(rootCoordinator: self)
-            return signInRouter
+        let hasTokens = KeychainManager.shared.getAccessToken() != nil && KeychainManager.shared.getRefreshToken() != nil
+        
+        if isLoggedIn || hasTokens {
+            print("User is logged in or has tokens, showing main screen")
+            return MainRouter(rootCoordinator: self)
         } else {
+            print("User is not logged in and has no tokens, showing sign in screen")
             let signInRouter = SignInRouter(rootCoordinator: self)
-            print("isLoggedIn false")
             return signInRouter
         }
     }

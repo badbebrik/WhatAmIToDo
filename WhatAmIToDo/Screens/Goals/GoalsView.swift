@@ -25,7 +25,11 @@ struct GoalsView: View {
                 }
             }
         }
-        .task { await viewModel.loadGoals() }
+        .onAppear {
+            Task {
+                await viewModel.loadGoals()
+            }
+        }
         .sheet(isPresented: $isShowingCreate) {
             NavigationView {
                 GoalCreateView(viewModel: GoalCreateViewModel())

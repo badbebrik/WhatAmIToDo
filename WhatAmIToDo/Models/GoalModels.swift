@@ -142,8 +142,9 @@ struct ListGoalItem: Codable {
     let description: String?
     let status: String
     let progress: Int
-    let hoursPerWeek: Int
-    let updatedAt: Date
+    let hoursPerWeek: Int?
+    let updatedAt: Date?
+    let createdAt: Date?
     let nextTask: NextTask?
     
     enum CodingKeys: String, CodingKey {
@@ -154,6 +155,7 @@ struct ListGoalItem: Codable {
         case progress
         case hoursPerWeek = "hours_per_week"
         case updatedAt = "updated_at"
+        case createdAt = "created_at"
         case nextTask = "next_task"
     }
     

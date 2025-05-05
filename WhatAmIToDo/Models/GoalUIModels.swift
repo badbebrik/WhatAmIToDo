@@ -10,6 +10,7 @@ struct GoalListItem: Identifiable {
     let progress: Int
     let hoursPerWeek: Int
     let updatedAt: Date
+    let createdAt: Date
     let nextTask: NextTask?
     let color: Color
     
@@ -19,8 +20,9 @@ struct GoalListItem: Identifiable {
         self.description = listGoalItem.description
         self.status = GoalStatus(rawValue: listGoalItem.status) ?? .active
         self.progress = listGoalItem.progress
-        self.hoursPerWeek = listGoalItem.hoursPerWeek
-        self.updatedAt = listGoalItem.updatedAt
+        self.hoursPerWeek = listGoalItem.hoursPerWeek ?? 0
+        self.updatedAt = listGoalItem.updatedAt ?? Date()
+        self.createdAt = listGoalItem.createdAt ?? Date()
         self.nextTask = listGoalItem.nextTask.map { NextTask(from: $0) }
         self.color = GoalStatus(rawValue: listGoalItem.status)?.color ?? .blue
     }

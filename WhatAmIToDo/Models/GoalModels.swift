@@ -173,17 +173,21 @@ struct ListGoalItem: Codable {
 }
 
 // MARK: - Response Models
+struct GetGoalResponse: Codable {
+    let goal: GoalResponse
+}
+
 struct GoalResponse: Codable {
     let id: UUID
-    let userId: Int64
+    let userId: Int64?
     let title: String
     let description: String?
     let status: String
-    let hoursPerWeek: Int
+    let hoursPerWeek: Int?
     let estimatedTime: Int?
     let progress: Int
-    let createdAt: Date
-    let updatedAt: Date
+    let createdAt: Date?
+    let updatedAt: Date?
     let phases: [PhaseResponse]?
     
     enum CodingKeys: String, CodingKey {
@@ -203,14 +207,14 @@ struct GoalResponse: Codable {
 
 struct PhaseResponse: Codable {
     let id: UUID
-    let goalId: UUID
+    let goalId: UUID?
     let title: String
     let description: String?
     let status: String
     let progress: Int
     let order: Int
-    let createdAt: Date
-    let updatedAt: Date
+    let createdAt: Date?
+    let updatedAt: Date?
     let tasks: [TaskResponse]?
     
     enum CodingKeys: String, CodingKey {
@@ -228,17 +232,17 @@ struct PhaseResponse: Codable {
 }
 
 struct TaskResponse: Codable {
-    let id: UUID
-    let goalId: UUID
+    let id: UUID?
+    let goalId: UUID?
     let phaseId: UUID?
     let title: String
     let description: String?
     let status: String
     let estimatedTime: Int?
     let completedAt: Date?
-    let createdAt: Date
-    let updatedAt: Date
-    
+    let createdAt: Date?
+    let updatedAt: Date?
+
     enum CodingKeys: String, CodingKey {
         case id
         case goalId = "goal_id"

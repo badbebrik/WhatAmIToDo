@@ -91,6 +91,9 @@ final class GoalNetworkManager {
     
     // MARK: - List Goals
     func listGoals(request: ListGoalsRequest) async throws -> ListGoalsResponse {
+        print("GoalNetworkManager: Запрос списка целей")
+        print("GoalNetworkManager: Параметры запроса - limit: \(request.limit), offset: \(request.offset), status: \(request.status ?? "не указан")")
+        
         var components = URLComponents(string: baseURL + "/api/goals")!
         components.queryItems = [
             URLQueryItem(name: "limit", value: String(request.limit)),
@@ -102,6 +105,7 @@ final class GoalNetworkManager {
         }
         
         guard let url = components.url else {
+            print("GoalNetworkManager: Неверный URL")
             throw GoalNetworkError.invalidURL
         }
         
@@ -110,28 +114,91 @@ final class GoalNetworkManager {
         
         if let token = await SessionManager.shared.accessToken {
             urlRequest.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
+            print("GoalNetworkManager: Токен авторизации получен")
+        } else {
+            print("GoalNetworkManager: Токен авторизации не найден")
+            throw GoalNetworkError.unauthorized
         }
         
+        print("GoalNetworkManager: Отправляем запрос на \(url.absoluteString)")
         let (data, response) = try await session.data(for: urlRequest)
         
         guard let httpResponse = response as? HTTPURLResponse else {
+            print("GoalNetworkManager: Неверный формат ответа")
             throw GoalNetworkError.invalidResponse
         }
         
+        print("GoalNetworkManager: Получен ответ с кодом: \(httpResponse.statusCode)")
+        
         switch httpResponse.statusCode {
         case 200:
+            print("GoalNetworkManager: Успешный ответ")
+            if let responseString = String(data: data, encoding: .utf8) {
+                print("GoalNetworkManager: Тело ответа: \(responseString)")
+            }
+            
             let decoder = JSONDecoder()
             decoder.dateDecodingStrategy = .iso8601
-            return try decoder.decode(ListGoalsResponse.self, from: data)
+            decoder.keyDecodingStrategy = .convertFromSnakeCase
+            
+            do {
+                let result = try decoder.decode(ListGoalsResponse.self, from: data)
+                print("GoalNetworkManager: Успешно декодировано:")
+                print("GoalNetworkManager: Количество целей: \(result.goals.count)")
+                print("GoalNetworkManager: Всего: \(result.meta.total)")
+                print("GoalNetworkManager: Лимит: \(result.meta.limit)")
+                print("GoalNetworkManager: Смещение: \(result.meta.offset)")
+                
+                if !result.goals.isEmpty {
+                    print("GoalNetworkManager: Пример первой цели:")
+                    let firstGoal = result.goals[0]
+                    print("GoalNetworkManager: ID: \(firstGoal.id)")
+                    print("GoalNetworkManager: Название: \(firstGoal.title)")
+                    print("GoalNetworkManager: Статус: \(firstGoal.status)")
+                    print("GoalNetworkManager: Прогресс: \(firstGoal.progress)")
+                    print("GoalNetworkManager: Часов в неделю: \(firstGoal.hoursPerWeek ?? 0)")
+                    print("GoalNetworkManager: Обновлено: \(firstGoal.updatedAt?.description ?? "нет")")
+                }
+                
+                return result
+            } catch let decodingError as DecodingError {
+                print("GoalNetworkManager: Ошибка декодирования:")
+                switch decodingError {
+                case .dataCorrupted(let context):
+                    print("GoalNetworkManager: Data corrupted: \(context.debugDescription)")
+                case .keyNotFound(let key, let context):
+                    print("GoalNetworkManager: Key not found: \(key.stringValue) in \(context.debugDescription)")
+                case .typeMismatch(let type, let context):
+                    print("GoalNetworkManager: Type mismatch: expected \(type) in \(context.debugDescription)")
+                case .valueNotFound(let type, let context):
+                    print("GoalNetworkManager: Value not found: expected \(type) in \(context.debugDescription)")
+                @unknown default:
+                    print("GoalNetworkManager: Unknown decoding error: \(decodingError)")
+                }
+                throw GoalNetworkError.decodingError
+            }
         case 401:
+            print("GoalNetworkManager: Ошибка авторизации")
             throw GoalNetworkError.unauthorized
+        case 500:
+            if let responseString = String(data: data, encoding: .utf8) {
+                print("GoalNetworkManager: Ошибка сервера: \(responseString)")
+            }
+            throw GoalNetworkError.networkError(NSError(domain: "GoalNetworkManager", code: 500, userInfo: [NSLocalizedDescriptionKey: "Ошибка сервера"]))
         default:
+            print("GoalNetworkManager: Неизвестная ошибка: \(httpResponse.statusCode)")
+            if let responseString = String(data: data, encoding: .utf8) {
+                print("GoalNetworkManager: Тело ответа: \(responseString)")
+            }
             throw GoalNetworkError.unknown
         }
     }
     
     // MARK: - Get Goal
     func getGoal(id: UUID) async throws -> GoalResponse {
+        print("GoalNetworkManager: Запрос деталей цели")
+        print("GoalNetworkManager: ID цели: \(id)")
+        
         let endpoint = "/api/goals/\(id)"
         let url = try createURL(for: endpoint)
         
@@ -140,22 +207,76 @@ final class GoalNetworkManager {
         
         if let token = await SessionManager.shared.accessToken {
             urlRequest.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
+            print("GoalNetworkManager: Токен авторизации получен")
+        } else {
+            print("GoalNetworkManager: Токен авторизации не найден")
+            throw GoalNetworkError.unauthorized
         }
         
+        print("GoalNetworkManager: Отправляем запрос на \(url.absoluteString)")
         let (data, response) = try await session.data(for: urlRequest)
         
         guard let httpResponse = response as? HTTPURLResponse else {
+            print("GoalNetworkManager: Неверный формат ответа")
             throw GoalNetworkError.invalidResponse
         }
         
+        print("GoalNetworkManager: Получен ответ с кодом: \(httpResponse.statusCode)")
+        
         switch httpResponse.statusCode {
         case 200:
+            print("GoalNetworkManager: Успешный ответ")
+            if let responseString = String(data: data, encoding: .utf8) {
+                print("GoalNetworkManager: Тело ответа: \(responseString)")
+            }
+            
             let decoder = JSONDecoder()
             decoder.dateDecodingStrategy = .iso8601
-            return try decoder.decode(GoalResponse.self, from: data)
+            decoder.keyDecodingStrategy = .convertFromSnakeCase
+            
+            do {
+                let result = try decoder.decode(GetGoalResponse.self, from: data)
+                print("GoalNetworkManager: Успешно декодировано:")
+                print("GoalNetworkManager: ID: \(result.goal.id)")
+                print("GoalNetworkManager: Название: \(result.goal.title)")
+                print("GoalNetworkManager: Статус: \(result.goal.status)")
+                print("GoalNetworkManager: Прогресс: \(result.goal.progress)")
+                print("GoalNetworkManager: Часов в неделю: \(result.goal.hoursPerWeek)")
+                print("GoalNetworkManager: Обновлено: \(result.goal.updatedAt)")
+                print("GoalNetworkManager: Количество фаз: \(result.goal.phases?.count ?? 0)")
+                return result.goal
+            } catch let decodingError as DecodingError {
+                print("GoalNetworkManager: Ошибка декодирования:")
+                switch decodingError {
+                case .dataCorrupted(let context):
+                    print("GoalNetworkManager: Data corrupted: \(context.debugDescription)")
+                case .keyNotFound(let key, let context):
+                    print("GoalNetworkManager: Key not found: \(key.stringValue) in \(context.debugDescription)")
+                case .typeMismatch(let type, let context):
+                    print("GoalNetworkManager: Type mismatch: expected \(type) in \(context.debugDescription)")
+                case .valueNotFound(let type, let context):
+                    print("GoalNetworkManager: Value not found: expected \(type) in \(context.debugDescription)")
+                @unknown default:
+                    print("GoalNetworkManager: Unknown decoding error: \(decodingError)")
+                }
+                throw GoalNetworkError.decodingError
+            }
         case 401:
+            print("GoalNetworkManager: Ошибка авторизации")
             throw GoalNetworkError.unauthorized
+        case 404:
+            print("GoalNetworkManager: Цель не найдена")
+            throw GoalNetworkError.networkError(NSError(domain: "GoalNetworkManager", code: 404, userInfo: [NSLocalizedDescriptionKey: "Цель не найдена"]))
+        case 500:
+            if let responseString = String(data: data, encoding: .utf8) {
+                print("GoalNetworkManager: Ошибка сервера: \(responseString)")
+            }
+            throw GoalNetworkError.networkError(NSError(domain: "GoalNetworkManager", code: 500, userInfo: [NSLocalizedDescriptionKey: "Ошибка сервера"]))
         default:
+            print("GoalNetworkManager: Неизвестная ошибка: \(httpResponse.statusCode)")
+            if let responseString = String(data: data, encoding: .utf8) {
+                print("GoalNetworkManager: Тело ответа: \(responseString)")
+            }
             throw GoalNetworkError.unknown
         }
     }

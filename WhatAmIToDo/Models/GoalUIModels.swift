@@ -2,7 +2,11 @@ import Foundation
 import SwiftUI
 
 // MARK: - Goal List UI Models
-struct GoalListItem: Identifiable {
+struct GoalListItem: Identifiable, Hashable {
+    static func == (lhs: GoalListItem, rhs: GoalListItem) -> Bool {
+        lhs.id == rhs.id
+    }
+
     let id: UUID
     let title: String
     let description: String?
@@ -27,7 +31,7 @@ struct GoalListItem: Identifiable {
         self.color = GoalStatus(rawValue: listGoalItem.status)?.color ?? .blue
     }
     
-    struct NextTask {
+    struct NextTask: Hashable {
         let id: UUID
         let title: String
         let dueDate: Date?
@@ -49,8 +53,8 @@ struct GoalDetailItem: Identifiable {
     let hoursPerWeek: Int
     let estimatedTime: Int?
     let progress: Int
-    let createdAt: Date
-    let updatedAt: Date
+    let createdAt: Date?
+    let updatedAt: Date?
     let phases: [PhaseDetailItem]?
     
     init(from goalResponse: GoalResponse) {
@@ -58,7 +62,7 @@ struct GoalDetailItem: Identifiable {
         self.title = goalResponse.title
         self.description = goalResponse.description
         self.status = GoalStatus(rawValue: goalResponse.status) ?? .active
-        self.hoursPerWeek = goalResponse.hoursPerWeek
+        self.hoursPerWeek = goalResponse.hoursPerWeek ?? 0
         self.estimatedTime = goalResponse.estimatedTime
         self.progress = goalResponse.progress
         self.createdAt = goalResponse.createdAt
@@ -96,7 +100,7 @@ struct TaskDetailItem: Identifiable {
     let completedAt: Date?
     
     init(from taskResponse: TaskResponse) {
-        self.id = taskResponse.id
+        self.id = taskResponse.id ?? UUID()
         self.title = taskResponse.title
         self.description = taskResponse.description
         self.status = TaskStatus(rawValue: taskResponse.status) ?? .pending

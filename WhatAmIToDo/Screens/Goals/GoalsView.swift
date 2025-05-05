@@ -4,6 +4,7 @@ struct GoalsView: View {
     @StateObject private var viewModel: GoalsViewModel
     @Environment(\.colorScheme) private var colorScheme
     @State private var isShowingCreate = false
+    @State private var selectedGoal: GoalListItem?
 
     init(viewModel: GoalsViewModel) {
         _viewModel = StateObject(wrappedValue: viewModel)
@@ -35,6 +36,9 @@ struct GoalsView: View {
                 GoalCreateView(viewModel: GoalCreateViewModel())
             }
         }
+        .navigationDestination(item: $selectedGoal) { goal in
+            GoalDetailView(viewModel: GoalDetailViewModel(goalId: goal.id))
+        }
     }
 
     // MARK: - Под-view
@@ -50,7 +54,7 @@ struct GoalsView: View {
                     LazyVStack(spacing: 16) {
                         ForEach(viewModel.goals) { goal in
                             GoalCardView(goal: goal)
-                                .onTapGesture { viewModel.onGoalTap(goal) }
+                                .onTapGesture { selectedGoal = goal }
                                 .transition(.scale.combined(with: .opacity))
                         }
                     }
@@ -90,8 +94,6 @@ struct GoalsView: View {
         .padding(.bottom, 24)
     }
 }
-
-
 
 struct GoalCardView: View {
     let goal: GoalListItem

@@ -11,7 +11,7 @@ struct GoalsView: View {
     }
 
     var body: some View {
-        NavigationStack(path: $path) {
+        NavigationView {
             ZStack(alignment: .bottomTrailing) {
                 content
                     .navigationDestination(for: AnyRoutable.self) { router in

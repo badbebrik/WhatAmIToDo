@@ -2,11 +2,11 @@ import SwiftUI
 
 class GoalsRouter {
     private let rootCoordinator: NavigationCoordinator
-    
+
     init(rootCoordinator: NavigationCoordinator) {
         self.rootCoordinator = rootCoordinator
     }
-    
+
     func routeToGoalDetail(goalId: UUID) {
         let router = GoalDetailRouter(rootCoordinator: self.rootCoordinator, goalId: goalId)
         rootCoordinator.push(router)
@@ -23,7 +23,7 @@ extension GoalsRouter: Routable {
     static func == (lhs: GoalsRouter, rhs: GoalsRouter) -> Bool {
         return false
     }
-    
+
     func hash(into hasher: inout Hasher) {
     }
 }
@@ -36,5 +36,3 @@ extension GoalsRouter {
         return AnyView(view)
     }
 }
-
-

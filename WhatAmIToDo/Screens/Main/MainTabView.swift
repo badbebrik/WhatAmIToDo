@@ -20,7 +20,7 @@ struct MainTabView: View {
                     Label("Календарь", systemImage: "calendar")
                 }
             
-            GoalsView(viewModel: GoalsViewModel(router: GoalsRouter(rootCoordinator: rootCoordinator)))
+            GoalsView(viewModel: GoalsViewModel())
                 .tabItem {
                     Label("Задачи", systemImage: "checklist")
                 }

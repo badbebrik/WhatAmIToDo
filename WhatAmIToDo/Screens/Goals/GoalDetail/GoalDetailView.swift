@@ -177,9 +177,3 @@ struct TaskRowView: View {
         .padding(.vertical, 4)
     }
 }
-
-#Preview {
-    NavigationView {
-        GoalDetailView(viewModel: GoalDetailViewModel(router: .mock, goalId: UUID()))
-    }
-} 

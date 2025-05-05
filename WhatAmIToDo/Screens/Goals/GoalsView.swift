@@ -1,46 +1,39 @@
 import SwiftUI
 
-
 struct GoalsView: View {
     @StateObject private var viewModel: GoalsViewModel
-    @State private var path = NavigationPath()
     @Environment(\.colorScheme) private var colorScheme
+    @State private var isShowingCreate = false
 
     init(viewModel: GoalsViewModel) {
         _viewModel = StateObject(wrappedValue: viewModel)
     }
 
     var body: some View {
-        NavigationView {
-            ZStack(alignment: .bottomTrailing) {
-                content
-                    .navigationDestination(for: AnyRoutable.self) { router in
-                        router.makeView()
-                    }
-
-                addButton
-            }
-            .navigationTitle("Мои цели")
-            .navigationBarTitleDisplayMode(.large)
-            .toolbar {
-                ToolbarItem(placement: .navigationBarTrailing) {
-                    Button {
-                        Task { await viewModel.refresh() }
-                    } label: {
-                        Image(systemName: "arrow.clockwise")
-                    }
+        ZStack(alignment: .bottomTrailing) {
+            content
+            addButton
+        }
+        .navigationTitle("Мои цели")
+        .navigationBarTitleDisplayMode(.large)
+        .toolbar {
+            ToolbarItem(placement: .navigationBarTrailing) {
+                Button {
+                    Task { await viewModel.refresh() }
+                } label: {
+                    Image(systemName: "arrow.clockwise")
                 }
             }
-            .task { await viewModel.loadGoals() }
-            .onAppear {
-                viewModel.setLocalCoordinator(
-                    LocalNavigationCoordinator(path: $path)
-                )
+        }
+        .task { await viewModel.loadGoals() }
+        .sheet(isPresented: $isShowingCreate) {
+            NavigationView {
+                GoalCreateView(viewModel: GoalCreateViewModel())
             }
         }
     }
 
-    // MARK: - Под‑view
+    // MARK: - Под-view
 
     private var content: some View {
         ZStack {
@@ -77,7 +70,7 @@ struct GoalsView: View {
 
     private var addButton: some View {
         Button {
-            viewModel.onCreateGoalTap()
+            isShowingCreate.toggle()
         } label: {
             Image(systemName: "plus")
                 .font(.system(size: 24, weight: .bold))
@@ -93,6 +86,7 @@ struct GoalsView: View {
         .padding(.bottom, 24)
     }
 }
+
 
 
 struct GoalCardView: View {

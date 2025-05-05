@@ -16,7 +16,7 @@ final class GoalNetworkManager {
     
     private init() {
         let configuration = URLSessionConfiguration.default
-        configuration.timeoutIntervalForRequest = 30
+        configuration.timeoutIntervalForRequest = 120
         configuration.timeoutIntervalForResource = 300
         session = URLSession(configuration: configuration)
     }

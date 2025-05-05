@@ -32,7 +32,6 @@ struct GoalPreviewView: View {
 
                 HStack {
                     Button("Отменить") {
-                        viewModel.navigateBack()
                     }
                     .buttonStyle(.bordered)
 

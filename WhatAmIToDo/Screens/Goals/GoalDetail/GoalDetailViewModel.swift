@@ -2,7 +2,6 @@ import Foundation
 
 @MainActor
 class GoalDetailViewModel: ObservableObject {
-    private let router: GoalDetailRouter
     private let networkManager: GoalNetworkManager
     let goalId: UUID
     
@@ -10,8 +9,7 @@ class GoalDetailViewModel: ObservableObject {
     @Published var isLoading = false
     @Published var error: Error?
     
-    init(router: GoalDetailRouter, goalId: UUID, networkManager: GoalNetworkManager = .shared) {
-        self.router = router
+    init(goalId: UUID, networkManager: GoalNetworkManager = .shared) {
         self.goalId = goalId
         self.networkManager = networkManager
     }

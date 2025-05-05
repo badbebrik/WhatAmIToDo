@@ -70,7 +70,11 @@ struct GenerateGoalResponse: Codable {
     }
 }
 
-struct GeneratedGoalPreview: Codable {
+struct GeneratedGoalPreview: Codable, Equatable {
+    static func == (lhs: GeneratedGoalPreview, rhs: GeneratedGoalPreview) -> Bool {
+        lhs.title == rhs.title
+    }
+
     let title: String
     let description: String?
     let hoursPerWeek: Int

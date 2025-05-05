@@ -13,13 +13,10 @@ final class GoalCreateViewModel: ObservableObject {
     @Published var description = ""
     @Published var hoursPerWeek = 1
     @Published var isLoading = false
+    @Published var generatedPreview: GeneratedGoalPreview?
+    @Published var errorMessage: String?
 
-    private let router: GoalCreateRouter
     private let network = GoalNetworkManager.shared
-
-    init(router: GoalCreateRouter) {
-        self.router = router
-    }
 
     var canProceed: Bool {
         !title.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
@@ -28,6 +25,7 @@ final class GoalCreateViewModel: ObservableObject {
     func generatePreview() async {
         guard canProceed else { return }
         isLoading = true; defer { isLoading = false }
+        errorMessage = nil
 
         do {
             let resp = try await network.generateGoal(
@@ -37,10 +35,11 @@ final class GoalCreateViewModel: ObservableObject {
                     hoursPerWeek: hoursPerWeek
                 )
             )
-            router.routeToPreview(resp.generatedGoal)
+            generatedPreview = resp.generatedGoal
+        } catch let error as URLError where error.code == .timedOut {
+            errorMessage = "Генерация цели занимает больше времени, чем ожидалось."
         } catch {
-            // TODO: показать алерт
-            print(error)
+            errorMessage = "Произошла ошибка при генерации предпросмотра: \(error.localizedDescription)"
         }
     }
 }

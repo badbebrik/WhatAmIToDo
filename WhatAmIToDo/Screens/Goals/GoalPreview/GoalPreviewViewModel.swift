@@ -12,17 +12,12 @@ final class GoalPreviewViewModel: ObservableObject {
     @Published var isSaving = false
 
     let preview: GeneratedGoalPreview
-    private let router: GoalPreviewRouter
     private let network = GoalNetworkManager.shared
 
-    init(router: GoalPreviewRouter, preview: GeneratedGoalPreview) {
-        self.router = router
+    init(preview: GeneratedGoalPreview) {
         self.preview = preview
     }
 
-    func navigateBack() {
-        router.pop()
-    }
 
     func saveGoal() async {
         isSaving = true; defer { isSaving = false }
@@ -30,7 +25,6 @@ final class GoalPreviewViewModel: ObservableObject {
             _ = try await network.createGoal(
                 request: preview.asCreateGoalRequest()
             )
-            router.popToRoot()                     // вернулись в список целей
         } catch {
             // TODO: показать алерт
             print(error)

@@ -13,7 +13,7 @@ class GoalsRouter {
     }
 
     func routeToGoalCreate() {
-        let router = GoalsRouter(rootCoordinator: self.rootCoordinator)
+        let router = GoalCreateRouter(rootCoordinator: self.rootCoordinator)
         rootCoordinator.push(router)
     }
 }
@@ -36,3 +36,5 @@ extension GoalsRouter {
         return AnyView(view)
     }
 }
+
+

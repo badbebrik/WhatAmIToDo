@@ -1,7 +1,9 @@
 import SwiftUI
 
+
 struct GoalsView: View {
     @StateObject private var viewModel: GoalsViewModel
+    @State private var path = NavigationPath()
     @Environment(\.colorScheme) private var colorScheme
 
     init(viewModel: GoalsViewModel) {
@@ -9,89 +11,89 @@ struct GoalsView: View {
     }
 
     var body: some View {
-        NavigationView {
+        NavigationStack(path: $path) {
             ZStack(alignment: .bottomTrailing) {
-                ZStack {
-                    backgroundGradient
-
-                    if viewModel.isLoading && viewModel.goals.isEmpty {
-                        ProgressView()
-                            .scaleEffect(1.5)
-                    } else {
-                        ScrollView {
-                            LazyVStack(spacing: 16) {
-                                ForEach(viewModel.goals) { goal in
-                                    GoalCardView(goal: goal)
-                                        .onTapGesture {
-                                            viewModel.onGoalTap(goal)
-                                        }
-                                        .transition(.scale.combined(with: .opacity))
-                                }
-                            }
-                            .padding()
-                        }
-                        .refreshable {
-                            await viewModel.refresh()
-                        }
+                content
+                    .navigationDestination(for: AnyRoutable.self) { router in
+                        router.makeView()
                     }
-                }
 
-                VStack {
-                    Spacer()
-
-                    HStack {
-                        Spacer()
-
-                        Button(action: {
-                            viewModel.onCreateGoalTap()
-                        }) {
-                            Image(systemName: "plus")
-                                .font(.system(size: 24, weight: .bold))
-                                .foregroundColor(.white)
-                                .padding(20)
-                                .background(
-                                    Circle()
-                                        .fill(Color.blue)
-                                        .shadow(color: Color.black.opacity(0.3), radius: 8, x: 0, y: 4)
-                                )
-                        }
-                        .padding(.trailing, 24)
-                        .padding(.bottom, 24)
-                    }
-                }
+                addButton
             }
             .navigationTitle("Мои цели")
             .navigationBarTitleDisplayMode(.large)
             .toolbar {
                 ToolbarItem(placement: .navigationBarTrailing) {
-                    Button(action: {
-                        Task {
-                            await viewModel.refresh()
-                        }
-                    }) {
+                    Button {
+                        Task { await viewModel.refresh() }
+                    } label: {
                         Image(systemName: "arrow.clockwise")
-                            .foregroundColor(.primary)
                     }
                 }
             }
+            .task { await viewModel.loadGoals() }
+            .onAppear {
+                viewModel.setLocalCoordinator(
+                    LocalNavigationCoordinator(path: $path)
+                )
+            }
         }
-        .task {
-            await viewModel.loadGoals()
+    }
+
+    // MARK: - Под‑view
+
+    private var content: some View {
+        ZStack {
+            backgroundGradient
+
+            if viewModel.isLoading && viewModel.goals.isEmpty {
+                ProgressView().scaleEffect(1.5)
+            } else {
+                ScrollView {
+                    LazyVStack(spacing: 16) {
+                        ForEach(viewModel.goals) { goal in
+                            GoalCardView(goal: goal)
+                                .onTapGesture { viewModel.onGoalTap(goal) }
+                                .transition(.scale.combined(with: .opacity))
+                        }
+                    }
+                    .padding()
+                }
+                .refreshable { await viewModel.refresh() }
+            }
         }
     }
 
     private var backgroundGradient: some View {
         LinearGradient(
             colors: [
-                colorScheme == .dark ? Color.black : Color.white,
-                colorScheme == .dark ? Color.gray.opacity(0.3) : Color.blue.opacity(0.1)
+                colorScheme == .dark ? .black : .white,
+                colorScheme == .dark ? .gray.opacity(0.3) : .blue.opacity(0.1)
             ],
-            startPoint: .top,
-            endPoint: .bottom
+            startPoint: .top, endPoint: .bottom
         )
         .ignoresSafeArea()
     }
+
+    private var addButton: some View {
+        Button {
+            viewModel.onCreateGoalTap()
+        } label: {
+            Image(systemName: "plus")
+                .font(.system(size: 24, weight: .bold))
+                .foregroundColor(.white)
+                .padding(20)
+                .background(
+                    Circle()
+                        .fill(Color.blue)
+                        .shadow(color: .black.opacity(0.3), radius: 8, x: 0, y: 4)
+                )
+        }
+        .padding(.trailing, 24)
+        .padding(.bottom, 24)
+    }
 }
+
 
 struct GoalCardView: View {
     let goal: GoalListItem

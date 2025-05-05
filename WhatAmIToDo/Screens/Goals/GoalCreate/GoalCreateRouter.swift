@@ -16,7 +16,7 @@ class GoalCreateRouter {
 }
 
 extension GoalCreateRouter: Routable {
-    func makeView() -> AnyView {
+    @MainActor func makeView() -> AnyView {
         let viewModel = GoalCreateViewModel(router: self)
         let view = GoalCreateView(viewModel: viewModel)
         return AnyView(view)
@@ -35,5 +35,12 @@ extension GoalCreateRouter: Routable {
 extension GoalCreateRouter {
     func pop() {
         self.rootCoordinator.popLast()
+    }
+}
+
+extension GoalCreateRouter {
+    func routeToPreview(_ preview: GeneratedGoalPreview) {
+        let router = GoalPreviewRouter(rootCoordinator: self.rootCoordinator, preview: preview)
+        rootCoordinator.push(router)
     }
 }

@@ -3,40 +3,46 @@ import SwiftUI
 
 @MainActor
 class GoalsViewModel: ObservableObject {
-    private let router: GoalsRouter
-    private let networkManager: GoalNetworkManager
+    private var coordinator: NavigationCoordinator?
+    private let network: GoalNetworkManager
 
     @Published var goals: [GoalListItem] = []
     @Published var isLoading = false
     @Published var error: Error?
-    
-    init(router: GoalsRouter, networkManager: GoalNetworkManager = .shared) {
-        self.router = router
-        self.networkManager = networkManager
+
+    init(router _: GoalsRouter, networkManager: GoalNetworkManager = .shared) {
+        self.network = networkManager
     }
-    
+
+    // MARK: - Навигация
+
+    func setLocalCoordinator(_ coord: NavigationCoordinator) {
+        coordinator = coord
+    }
+
+    func onGoalTap(_ goal: GoalListItem) {
+        guard let coordinator else { return }
+        coordinator.push(GoalDetailRouter(rootCoordinator: coordinator, goalId: goal.id))
+    }
+
+    func onCreateGoalTap() {
+        guard let coordinator else { return }
+        coordinator.push(GoalCreateRouter(rootCoordinator: coordinator))
+    }
+
+    // MARK: - Data
+
     func loadGoals() async {
-        isLoading = true
-        defer { isLoading = false }
-        
+        isLoading = true; defer { isLoading = false }
         do {
-            let request = ListGoalsRequest(limit: 20, offset: 0, status: nil)
-            let response = try await networkManager.listGoals(request: request)
-            goals = response.goals.map { GoalListItem(from: $0) }
+            let resp = try await network.listGoals(
+                request: .init(limit: 20, offset: 0, status: nil)
+            )
+            goals = resp.goals.map(GoalListItem.init)
         } catch {
             self.error = error
         }
     }
-    
-    func onGoalTap(_ goal: GoalListItem) {
-        router.routeToGoalDetail(goalId: goal.id)
-    }
 
-    func onCreateGoalTap() {
-        router.routeToGoalCreate()
-    }
-
-    func refresh() async {
-        await loadGoals()
-    }
-} 
+    func refresh() async { await loadGoals() }
+}

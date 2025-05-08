@@ -14,6 +14,8 @@ final class AvailabilityViewModel: ObservableObject {
         .init(day: $0, slots: [])
     }
 
+    @Published var selectedDay: DayOfWeek = .mon
+
     private let goalId: UUID
     private let network: GoalNetworkManager = .shared
 
@@ -21,15 +23,38 @@ final class AvailabilityViewModel: ObservableObject {
         self.goalId = goalId
     }
 
-    func slots(for day: DayOfWeek) -> [TimeSlotItem] {
-        days.first { $0.day == day }?.slots ?? []
+    func item(for day: DayOfWeek) -> DayAvailabilityItem? {
+        days.first { $0.day == day }
     }
 
-    func setSlots(_ newSlots: [TimeSlotItem], for day: DayOfWeek) {
-        guard let idx = days.firstIndex(where: { $0.day == day }) else {
-            return
-        }
-        days[idx].slots = newSlots.sorted()
+    func addSlot() {
+        guard let idx = days.firstIndex(where: { $0.day == selectedDay }) else { return }
+        let cal = Calendar.current
+        let start = cal.date(bySettingHour: 9, minute: 0, second: 0, of: Date())!
+        let end   = cal.date(byAdding: .hour, value: 1, to: start)!
+        days[idx].slots.append(TimeSlotItem(start: start, end: end))
+        days[idx].slots.sort()
     }
 
+
+    func delete(_ slot: TimeSlotItem) {
+        guard let dayIdx = days.firstIndex(where: { $0.day == selectedDay }),
+              let slotIdx = days[dayIdx].slots.firstIndex(of: slot) else { return }
+        days[dayIdx].slots.remove(at: slotIdx)
+    }
+
+    func binding(for slot: TimeSlotItem) -> Binding<TimeSlotItem> {
+        guard
+            let dayIdx  = days.firstIndex(where: { $0.day == selectedDay }),
+            let slotIdx = days[dayIdx].slots.firstIndex(of: slot)
+        else { return .constant(slot) }
+
+        return Binding<TimeSlotItem>(
+            get:  { self.days[dayIdx].slots[slotIdx] },
+            set:  { self.days[dayIdx].slots[slotIdx] = $0 }
+        )
+    }
+    func save(_ dismiss: DismissAction) async {
+
+    }
 }

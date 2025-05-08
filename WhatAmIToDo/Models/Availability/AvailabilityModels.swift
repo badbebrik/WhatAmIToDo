@@ -49,8 +49,8 @@ struct DayAvailabilityItem: Identifiable {
 
 struct TimeSlotItem: Identifiable, Comparable {
     let id = UUID()
-    let start: Date
-    let end: Date
+    var start: Date
+    var end: Date
 
     var formatted: String {
         "\(DateFormatter.hm.string(from: start)) – \(DateFormatter.hm.string(from: end))"

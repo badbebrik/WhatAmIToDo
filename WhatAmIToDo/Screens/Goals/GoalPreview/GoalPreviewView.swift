@@ -9,9 +9,12 @@ import SwiftUI
 
 struct GoalPreviewView: View {
     @StateObject private var viewModel: GoalPreviewViewModel
+    @Environment(\.presentationMode) private var presentationMode
+    let onDismiss: () -> Void
 
-    init(viewModel: GoalPreviewViewModel) {
+    init(viewModel: GoalPreviewViewModel, onDismiss: @escaping () -> Void) {
         _viewModel = StateObject(wrappedValue: viewModel)
+        self.onDismiss = onDismiss
     }
 
     var body: some View {
@@ -32,13 +35,19 @@ struct GoalPreviewView: View {
 
                 HStack {
                     Button("Отменить") {
+                        presentationMode.wrappedValue.dismiss()
+                        onDismiss()
                     }
                     .buttonStyle(.bordered)
 
                     Spacer()
 
                     Button("Сохранить цель") {
-                        Task { await viewModel.saveGoal() }
+                        Task {
+                            await viewModel.saveGoal()
+                            presentationMode.wrappedValue.dismiss()
+                            onDismiss()
+                        }
                     }
                     .buttonStyle(.borderedProminent)
                 }

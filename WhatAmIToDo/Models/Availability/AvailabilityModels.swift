@@ -56,14 +56,6 @@ struct TimeSlotItem: Identifiable, Comparable {
         "\(DateFormatter.hm.string(from: start)) – \(DateFormatter.hm.string(from: end))"
     }
 
-    static func < (l: Self, r: Self) -> Bool { l.start < r.start }
+    static func < (lhs: Self, rhs: Self) -> Bool { lhs.start < rhs.start }
 }
 
-
-private extension DateFormatter {
-    static let hm: DateFormatter = {
-        let df = DateFormatter()
-        df.dateFormat = "HH:mm"
-        return df
-    }()
-}

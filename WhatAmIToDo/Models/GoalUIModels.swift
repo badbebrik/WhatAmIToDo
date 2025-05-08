@@ -111,11 +111,13 @@ struct TaskDetailItem: Identifiable {
 
 // MARK: - Status Enums
 enum GoalStatus: String {
+
     case planning = "planning"
     case active = "active"
     case completed = "completed"
     case paused = "paused"
 
+    
     var color: Color {
         switch self {
         case .active: return .blue

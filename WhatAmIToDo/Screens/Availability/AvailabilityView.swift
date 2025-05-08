@@ -9,7 +9,7 @@ import SwiftUI
 
 struct AvailabilityView: View {
 
-    @StateObject private var viewModel: AvailabilityViewModel
+    @StateObject var viewModel: AvailabilityViewModel
     @Environment(\.dismiss) private var dismiss
     @State private var editingDay: DayOfWeek? = nil
 

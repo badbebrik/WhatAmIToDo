@@ -54,6 +54,11 @@ struct GoalDetailView: View {
         .task {
             await viewModel.loadGoal()
         }
+        .navigationDestination(isPresented: $showAvailability) {
+                    AvailabilityView(
+                        viewModel: AvailabilityViewModel(goalId: viewModel.goalId)
+                    )
+                }
     }
     
     private var backgroundGradient: some View {

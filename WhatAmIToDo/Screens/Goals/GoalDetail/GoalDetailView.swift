@@ -3,7 +3,9 @@ import SwiftUI
 struct GoalDetailView: View {
     @StateObject private var viewModel: GoalDetailViewModel
     @Environment(\.colorScheme) private var colorScheme
-    
+
+    @State private var showAvailability = false
+
     init(viewModel: GoalDetailViewModel) {
         _viewModel = StateObject(wrappedValue: viewModel)
     }
@@ -19,7 +21,24 @@ struct GoalDetailView: View {
                 ScrollView {
                     VStack(spacing: 24) {
                         GoalHeaderView(goal: goal)
-                        
+
+                        if goal.status == .planning {
+                            Button {
+                                showAvailability = true
+                            } label: {
+                                Label("Внедрить в расписание", systemImage: "calendar.badge.plus")
+                                    .font(.headline)
+                                    .frame(maxWidth: .infinity)
+                                    .padding()
+                                    .background(Color.accentColor)
+                                    .foregroundStyle(.white)
+                                    .clipShape(.capsule)
+                                    .shadow(color: .black.opacity(0.15), radius: 6, y: 4)
+                            }
+                            .padding(.horizontal)
+                        }
+
+
                         if let phases = goal.phases {
                             PhasesListView(phases: phases)
                         }

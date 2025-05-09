@@ -184,7 +184,7 @@ struct GoalResponse: Codable {
         case title
         case description
         case status
-        case hoursPerWeek = "hours_per_week"
+        case hoursPerWeek
         case estimatedTime = "estimated_time"
         case progress
         case createdAt = "created_at"

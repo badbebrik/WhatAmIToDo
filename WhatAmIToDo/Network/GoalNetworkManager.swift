@@ -237,9 +237,7 @@ final class GoalNetworkManager {
                 print("GoalNetworkManager: Тело ответа: \(responseString)")
             }
             
-            let decoder = JSONDecoder()
-            decoder.dateDecodingStrategy = .iso8601
-            decoder.keyDecodingStrategy = .convertFromSnakeCase
+            let decoder = createDateDecoder()
             
             do {
                 let result = try decoder.decode(GetGoalResponse.self, from: data)
@@ -248,8 +246,8 @@ final class GoalNetworkManager {
                 print("GoalNetworkManager: Название: \(result.goal.title)")
                 print("GoalNetworkManager: Статус: \(result.goal.status)")
                 print("GoalNetworkManager: Прогресс: \(result.goal.progress)")
-                print("GoalNetworkManager: Часов в неделю: \(result.goal.hoursPerWeek)")
-                print("GoalNetworkManager: Обновлено: \(result.goal.updatedAt)")
+                print("GoalNetworkManager: Часов в неделю: \(result.goal.hoursPerWeek ?? 0)")
+                print("GoalNetworkManager: Обновлено: \(result.goal.updatedAt?.description ?? "нет")")
                 print("GoalNetworkManager: Количество фаз: \(result.goal.phases?.count ?? 0)")
                 return result.goal
             } catch let decodingError as DecodingError {

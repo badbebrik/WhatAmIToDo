@@ -21,6 +21,15 @@ final class GoalNetworkManager {
         session = URLSession(configuration: configuration)
     }
     
+    private func createDateDecoder() -> JSONDecoder {
+        let decoder = JSONDecoder()
+        let dateFormatter = DateFormatter()
+        dateFormatter.dateFormat = "yyyy-MM-dd'T'HH:mm:ss.SSSSSSZZZZZ"
+        decoder.dateDecodingStrategy = .formatted(dateFormatter)
+        decoder.keyDecodingStrategy = .convertFromSnakeCase
+        return decoder
+    }
+    
     // MARK: - Generate Goal
     func generateGoal(request: GenerateGoalRequest) async throws -> GenerateGoalResponse {
         let endpoint = "/api/goals/generate"
@@ -137,9 +146,7 @@ final class GoalNetworkManager {
                 print("GoalNetworkManager: Тело ответа: \(responseString)")
             }
             
-            let decoder = JSONDecoder()
-            decoder.dateDecodingStrategy = .iso8601
-            decoder.keyDecodingStrategy = .convertFromSnakeCase
+            let decoder = createDateDecoder()
             
             do {
                 let result = try decoder.decode(ListGoalsResponse.self, from: data)

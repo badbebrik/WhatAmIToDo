@@ -11,7 +11,7 @@ struct UpdateAvailabilityRequest: Encodable {
     let days: [DayAvailabilityDTO]
 }
 
-struct DayAvailabilityDTO: Encodable {
+struct DayAvailabilityDTO: Codable {
     let dayOfWeek: Int
     let slots: [TimeSlotDTO]
 
@@ -21,7 +21,11 @@ struct DayAvailabilityDTO: Encodable {
     }
 }
 
-struct TimeSlotDTO: Encodable {
+struct AvailabilityResponse: Codable {
+    let days: [DayAvailabilityDTO]
+}
+
+struct TimeSlotDTO: Codable {
     let startTime: String
     let endTime: String
 

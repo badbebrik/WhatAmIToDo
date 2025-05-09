@@ -36,7 +36,6 @@ final class AvailabilityViewModel: ObservableObject {
         days[idx].slots.sort()
     }
 
-
     func delete(_ slot: TimeSlotItem) {
         guard let dayIdx = days.firstIndex(where: { $0.day == selectedDay }),
               let slotIdx = days[dayIdx].slots.firstIndex(of: slot) else { return }
@@ -54,7 +53,25 @@ final class AvailabilityViewModel: ObservableObject {
             set:  { self.days[dayIdx].slots[slotIdx] = $0 }
         )
     }
-    func save(_ dismiss: DismissAction) async {
 
+    func save(_ dismiss: DismissAction) async {
+        let body = UpdateAvailabilityRequest(
+            days: days
+                .filter { !$0.slots.isEmpty }
+                .map(DayAvailabilityDTO.init)
+        )
+        print("[Network] Saving availability:")
+        print("[Network] Days count: \(body.days.count)")
+        for day in body.days {
+            print("[Network] Day: \(day), slots: \(day.slots.count)")
+        }
+        do {
+            _ = try await ScheduleNetworkManager.shared
+                .updateAvailability(goalId: goalId, body: body)
+            print("[Network] Successfully saved")
+            dismiss()
+        } catch {
+            print("[Network] Error saving: \(error.localizedDescription)")
+        }
     }
 }

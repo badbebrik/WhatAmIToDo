@@ -52,7 +52,9 @@ private enum ScheduleEndpoint {
     func body() throws -> Data? {
         switch self {
         case .updateAvailability(_, let body):
-            return try JSONEncoder().encode(body)
+            let encoder = JSONEncoder()
+            encoder.keyEncodingStrategy = .convertToSnakeCase
+            return try encoder.encode(body)
         default: return nil
         }
     }
@@ -97,7 +99,14 @@ final class ScheduleNetworkManager {
         var req = URLRequest(url: url)
         req.httpMethod = ep.method
         req.setValue("application/json", forHTTPHeaderField: "Content-Type")
-        if let body = try ep.body() { req.httpBody = body }
+        if let body = try ep.body() { 
+            req.httpBody = body
+            print("[Network] Request to \(ep.path):")
+            print("[Network] Method: \(ep.method)")
+            if let bodyString = String(data: body, encoding: .utf8) {
+                print("[Network] Body: \(bodyString)")
+            }
+        }
 
         if let token = KeychainManager.shared.getAccessToken() {
             req.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
@@ -106,18 +115,24 @@ final class ScheduleNetworkManager {
         let (data, resp) = try await session.data(for: req)
         guard let http = resp as? HTTPURLResponse,
               200..<300 ~= http.statusCode else {
+            print("[Network] Error on \(ep.path):")
+            print("[Network] Status code: \((resp as? HTTPURLResponse)?.statusCode ?? -1)")
             throw NetworkError.invalidResponse(
                 statusCode: (resp as? HTTPURLResponse)?.statusCode ?? -1
             )
         }
 
+        print("[Network] Response from \(ep.path):")
+        if let responseString = String(data: data, encoding: .utf8) {
+            print("[Network] Body: \(responseString)")
+        }
 
         let decoder = JSONDecoder()
         decoder.keyDecodingStrategy = .convertFromSnakeCase
         let iso = ISO8601DateFormatter()
         iso.formatOptions = [.withInternetDateTime, .withFractionalSeconds]
-        decoder.dateDecodingStrategy = .custom { d in
-            let container = try d.singleValueContainer()
+        decoder.dateDecodingStrategy = .custom { dateinput in
+            let container = try dateinput.singleValueContainer()
             let str = try container.decode(String.self)
             if let date = iso.date(from: str) { return date }
             throw DecodingError.dataCorruptedError(

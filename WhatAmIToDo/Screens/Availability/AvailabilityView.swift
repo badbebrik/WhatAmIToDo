@@ -72,7 +72,6 @@ struct AvailabilityView: View {
     }
 }
 
-// MARK: - Визуальный «чип» дня недели
 private struct DayChip: View {
     let item: DayAvailabilityItem
     let isSelected: Bool

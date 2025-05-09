@@ -9,7 +9,7 @@ import SwiftUI
 
 struct GoalCreateView: View {
     @StateObject var viewModel: GoalCreateViewModel
-    @Environment(\.dismiss) private var dismissSheet
+    @Environment(\.presentationMode) private var presentationMode
     @State private var showPreview = false
 
     var body: some View {
@@ -62,7 +62,7 @@ struct GoalCreateView: View {
             .toolbar {
                 ToolbarItem(placement: .navigationBarLeading) {
                     Button("Отменить") {
-                        dismissSheet()
+                        presentationMode.wrappedValue.dismiss()
                     }
                 }
             }
@@ -74,10 +74,10 @@ struct GoalCreateView: View {
             .navigationDestination(isPresented: $showPreview) {
                 if let preview = viewModel.generatedPreview {
                     GoalPreviewView(
-                        viewModel: GoalPreviewViewModel(preview: preview)
+                        viewModel: GoalPreviewViewModel(preview: preview),
+                        onDismiss: { presentationMode.wrappedValue.dismiss() }
                     )
                 } else {
-
                     Text("Ошибка загрузки предпросмотра")
                 }
             }

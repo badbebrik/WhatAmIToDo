@@ -17,4 +17,6 @@ extension GoalStatus {
         case .planning:  return "Готова к планированию"
         }
     }
+
+    var tint: Color { color.opacity(0.1) }
 }

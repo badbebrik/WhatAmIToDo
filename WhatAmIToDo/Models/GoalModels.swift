@@ -147,18 +147,6 @@ struct ListGoalItem: Codable {
     let createdAt: Date?
     let nextTask: NextTask?
     
-    enum CodingKeys: String, CodingKey {
-        case id
-        case title
-        case description
-        case status
-        case progress
-        case hoursPerWeek = "hours_per_week"
-        case updatedAt = "updated_at"
-        case createdAt = "created_at"
-        case nextTask = "next_task"
-    }
-    
     struct NextTask: Codable {
         let id: UUID
         let title: String
@@ -196,7 +184,7 @@ struct GoalResponse: Codable {
         case title
         case description
         case status
-        case hoursPerWeek = "hours_per_week"
+        case hoursPerWeek
         case estimatedTime = "estimated_time"
         case progress
         case createdAt = "created_at"

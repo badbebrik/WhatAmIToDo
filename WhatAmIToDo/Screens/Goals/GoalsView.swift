@@ -98,50 +98,78 @@ struct GoalsView: View {
 struct GoalCardView: View {
     let goal: GoalListItem
 
+    private var statusBadge: some View {
+        Text(goal.status.localizedTitle)
+            .font(.caption.bold())
+            .padding(.horizontal, 8)
+            .padding(.vertical, 4)
+            .foregroundColor(.white)
+            .background(
+                Capsule().fill(goal.status.color)
+            )
+    }
+
+    private var statusStripe: some View {
+        Rectangle()
+            .fill(goal.status.color)
+            .frame(width: 6)
+            .clipShape(RoundedRectangle(cornerRadius: 3))
+    }
+
     var body: some View {
-        VStack(alignment: .leading, spacing: 12) {
-            HStack {
-                Text(goal.title)
-                    .font(.title2)
-                    .fontWeight(.bold)
-                    .foregroundColor(.primary)
+        HStack(spacing: 0) {
+            statusStripe
 
-                Spacer()
+            VStack(alignment: .leading, spacing: 12) {
 
-                Image(systemName: goal.status.icon)
-                    .foregroundColor(goal.color)
-                    .font(.title3)
-            }
+                HStack {
+                    Text(goal.title)
+                        .font(.title3.weight(.semibold))
+                        .foregroundColor(.primary)
+                        .lineLimit(2)
 
-            if let description = goal.description {
-                Text(description)
-                    .font(.subheadline)
-                    .foregroundColor(.secondary)
-                    .lineLimit(2)
-            }
+                    Spacer(minLength: 8)
+                    statusBadge
+                }
 
-            ProgressView(value: Double(goal.progress), total: 100)
-                .tint(goal.color)
+                if let description = goal.description {
+                    Text(description)
+                        .font(.subheadline)
+                        .foregroundColor(.secondary)
+                        .lineLimit(2)
+                }
 
-            HStack {
-                Label("\(goal.hoursPerWeek) ч/нед", systemImage: "clock")
-                    .font(.caption)
-                    .foregroundColor(.secondary)
+                ProgressView(value: Double(goal.progress), total: 100)
+                    .tint(goal.status.color)
 
-                Spacer()
-
-                if let nextTask = goal.nextTask {
-                    Label(nextTask.title, systemImage: "arrow.right.circle")
+                HStack {
+                    Label("\(goal.hoursPerWeek) ч/нед", systemImage: "clock")
                         .font(.caption)
                         .foregroundColor(.secondary)
+
+                    Spacer()
+
+                    if let next = goal.nextTask {
+                        Label(next.title, systemImage: "arrow.right.circle")
+                            .font(.caption)
+                            .foregroundColor(.secondary)
+                            .lineLimit(1)
+                    }
                 }
             }
+            .padding(16)
+            .background(
+                RoundedRectangle(cornerRadius: 16)
+                    .fill(goal.status.tint)
+                    .background(
+                        RoundedRectangle(cornerRadius: 16)
+                            .fill(Color(.systemBackground))
+                    )
+            )
         }
-        .padding()
-        .background(
-            RoundedRectangle(cornerRadius: 16)
-                .fill(Color(.systemBackground))
-                .shadow(color: Color.black.opacity(0.1), radius: 10, x: 0, y: 5)
-        )
+        .clipShape(RoundedRectangle(cornerRadius: 16))
+        .shadow(color: Color.black.opacity(0.07), radius: 6, y: 4)
+        .opacity(goal.status == .completed ? 0.55 :
+                 goal.status == .paused    ? 0.75 : 1)
     }
 }

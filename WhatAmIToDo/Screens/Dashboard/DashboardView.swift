@@ -67,7 +67,27 @@ struct DashboardView: View {
     }
 
     private struct UpcomingCarousel: View {
+        
+    }
 
+    private struct UpcomingCard: View {
+        let task: ScheduledTaskItem
+        var body: some View {
+            VStack(alignment: .leading, spacing: 6) {
+                Text(task.title)
+                    .font(.subheadline.weight(.semibold))
+                    .lineLimit(2)
+                Text(task.start, format: .dateTime.hour().minute())
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+            }
+            .padding()
+            .frame(width: 180, alignment: .leading)
+            .background(
+                RoundedRectangle(cornerRadius: 14)
+                    .fill(task.status.color.opacity(0.15))
+            )
+        }
     }
 
     private struct TodaySection: View {

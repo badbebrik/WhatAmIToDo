@@ -15,7 +15,51 @@ struct ScheduleView: View {
 
     var body: some View {
         VStack(spacing: 0) {
+            DateCarousel(selected: $viewModel.selectedDate) { date in
+                Task {
+                    await viewModel.load(for: date)
+                }
+            }
+            .padding(.vertical, 8)
+            .background(
+                Color(.systemBackground)
+                    .shadow(color: .black.opacity(0.05), radius: 4, y: 2)
+            )
 
+            Divider()
+
+            DayTimeline(tasks: viewModel.tasks)
+                .overlay(alignment: .topLeading) {
+                    if viewModel.isLoading {
+                        ProgressView()
+                            .offset(y: 120)
+                    }
+                }
+                .animation(.easeInOut, value: viewModel.tasks)
+
+            if let mot = viewModel.motivation {
+                HStack(spacing: 8) {
+                    Image(systemName: "sparkles")
+                    Text(mot)
+                        .font(
+                            .footnote
+                        )
+                        .multilineTextAlignment(.leading)
+                    Spacer()
+                }
+                .padding()
+                .background(
+                    RoundedRectangle(cornerRadius: 12)
+                        .fill(colorScheme == .dark ? Color.white.opacity(0.05) : Color.accentColor.opacity(0.08))
+                        .padding(.horizontal)
+                )
+                .transition(.move(edge: .bottom).combined(with: .opacity))
+            }
+        }
+        .navigationTitle("Расписание")
+        .navigationBarTitleDisplayMode(.inline)
+        .task {
+            await viewModel.initialLoad()
         }
     }
 

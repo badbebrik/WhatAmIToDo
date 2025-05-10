@@ -76,6 +76,15 @@ struct ScheduleView: View {
         private let hours = Array(0...23)
 
         var body: some View {
+            if tasks.isEmpty {
+                EmptyStateView()
+                    .frame(maxWidth: .infinity, maxHeight: .infinity)
+            } else {
+                timelineBody
+            }
+        }
+
+        private var timelineBody: some View {
             ScrollView {
                 LazyVStack(spacing: 0, pinnedViews: .sectionHeaders) {
                     Section {
@@ -98,6 +107,22 @@ struct ScheduleView: View {
                     }
                 }
             }
+        }
+    }
+
+    private struct EmptyStateView: View {
+        var body: some View {
+            VStack(spacing: 16) {
+                Image(systemName: "calendar.badge.exclamationmark")
+                    .font(.system(size: 46))
+                    .foregroundColor(.accentColor)
+
+                Text("Нет задач на этот день")
+                    .font(.headline)
+                    .multilineTextAlignment(.center)
+                    .foregroundColor(.secondary)
+            }
+            .padding()
         }
     }
 

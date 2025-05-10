@@ -20,8 +20,41 @@ struct ScheduleView: View {
     }
 
     private struct DayTimeline: View {
+        let tasks: [ScheduledTaskItem]
+
+        private let hours = Array(0...23)
+
         var body: some View {
             EmptyView()
+        }
+    }
+
+    private struct TaskBlock: View {
+        let task: ScheduledTaskItem
+
+        var body: some View {
+            GeometryReader { geo in
+                let top = // todo
+                let height = CGFloat(task.end.timeIntervalSince(task.start) / 3600) * 80
+
+                VStack(alignment: .leading, spacing: 4) {
+                    Text(task.title)
+                        .font(.subheadline.bold())
+                        .foregroundStyle(.white)
+                        .lineLimit(2)
+                    Text("\(task.start.hm) - \(task.end.hm)")
+                        .font(.caption2)
+                        .foregroundStyle(.white.opacity(0.8))
+                }
+                .padding(8)
+                .background(
+                    RoundedRectangle(cornerRadius: 10)
+                        .fill(task.status.color)
+                )
+                .frame(height: height, alignment: .top)
+                .position(x: geo.size.width / 2, y: top + height / 2)
+                .shadow(radius: 2, y: 1)
+            }
         }
     }
 

@@ -103,6 +103,10 @@ struct ScheduleView: View {
                                     .frame(height: 80, alignment: .top)
                                 }
                             }
+
+                            ForEach(tasks) { task in
+                                TaskBlock(task: task)
+                            }
                         }
                     }
                 }

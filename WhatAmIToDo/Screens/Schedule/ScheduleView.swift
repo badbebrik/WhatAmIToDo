@@ -46,6 +46,13 @@ struct ScheduleView: View {
                         )
                         .multilineTextAlignment(.leading)
                     Spacer()
+                    Button {
+                        withAnimation { viewModel.motivation = nil }
+                    } label: {
+                        Image(systemName: "xmark")
+                            .padding(6)
+                    }
+                    .buttonStyle(.plain)
                 }
                 .padding()
                 .background(

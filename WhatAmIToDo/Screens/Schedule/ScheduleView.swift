@@ -34,7 +34,7 @@ struct ScheduleView: View {
 
         var body: some View {
             GeometryReader { geo in
-                let top = // todo
+                let top = pixelOffset(for: task.start)
                 let height = CGFloat(task.end.timeIntervalSince(task.start) / 3600) * 80
 
                 VStack(alignment: .leading, spacing: 4) {
@@ -55,6 +55,13 @@ struct ScheduleView: View {
                 .position(x: geo.size.width / 2, y: top + height / 2)
                 .shadow(radius: 2, y: 1)
             }
+        }
+
+        private func pixelOffset(for date: Date) -> CGFloat {
+            let comp = Calendar.current.dateComponents([.hour, .minute], from: date)
+            let h = CGFloat(comp.hour ?? 0)
+            let m = CGFloat(comp.minute ?? 0)
+            return h * 80 + m / 60 * 80
         }
     }
 

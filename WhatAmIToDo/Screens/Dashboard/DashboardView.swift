@@ -67,7 +67,20 @@ struct DashboardView: View {
     }
 
     private struct UpcomingCarousel: View {
-        
+        let tasks: [ScheduledTaskItem]
+        var body: some View {
+            VStack(alignment: .leading, spacing: 8) {
+                Text("Ближайшие задачи")
+                    .font(.headline)
+                ScrollView(.horizontal, showsIndicators: false) {
+                    HStack(spacing: 12) {
+                        ForEach(tasks) { t in
+                            UpcomingCard(task: t)
+                        }
+                    }
+                }
+            }
+        }
     }
 
     private struct UpcomingCard: View {

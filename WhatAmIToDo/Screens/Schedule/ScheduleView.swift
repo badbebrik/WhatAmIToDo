@@ -39,5 +39,29 @@ struct ScheduleView: View {
         var body: some View {
             EmptyView()
         }
+
+        private func dayChip(for date: Date) -> some View {
+            let cal = Calendar.current
+            let isToday = cal.isDateInToday(date)
+            let isSel   = cal.isDate(date, inSameDayAs: selected)
+
+            return VStack(spacing: 4) {
+                Text(date, format: .dateTime.weekday(.narrow))
+                    .font(.caption2).bold()
+                Text(date, format: .dateTime.day())
+                    .font(.headline)
+            }
+            .foregroundColor(isSel ? .white : .primary)
+            .padding(.vertical, 8)
+            .padding(.horizontal, 12)
+            .background(
+                Capsule().fill(
+                    isSel ? Color.accentColor
+                    : isToday ? Color.accentColor.opacity(0.2)
+                    : Color.secondary.opacity(0.15)
+                )
+            )
+        }
     }
+
 }

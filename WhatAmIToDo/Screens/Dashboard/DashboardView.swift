@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import Charts
 
 struct DashboardView: View {
 
@@ -141,6 +142,26 @@ struct DashboardView: View {
     }
 
     private struct StatsSection: View {
+        let stats: StatsResponse
 
+        var body: some View {
+            VStack(alignment: .leading, spacing: 12) {
+                Text("Статистика")
+                    .font(.headline)
+
+                Chart {
+                    BarMark(x: .value("Completed", "Выполнено"),
+                            y: .value("Qty", stats.tasksCompleted))
+                    .foregroundStyle(.green)
+
+                    BarMark(x: .value("Planned", "Запланировано"),
+                            y: .value("Qty", stats.tasksPlanned))
+                    .foregroundStyle(.secondary)
+
+                }
+                .frame(height: 140)
+                .chartLegend(.hidden)
+            }
+        }
     }
 }

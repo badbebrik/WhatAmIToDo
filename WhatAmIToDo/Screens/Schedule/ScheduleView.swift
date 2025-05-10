@@ -25,7 +25,28 @@ struct ScheduleView: View {
         private let hours = Array(0...23)
 
         var body: some View {
-            EmptyView()
+            ScrollView {
+                LazyVStack(spacing: 0, pinnedViews: .sectionHeaders) {
+                    Section {
+                        ZStack(alignment: .topLeading) {
+                            VStack(spacing: 40) {
+                                ForEach(hours, id: \.self) { h in
+                                    HStack(spacing: 4) {
+                                        Text("\(h, format: .number) :00")
+                                            .font(.caption2)
+                                            .frame(width: 34, alignment: .trailing)
+                                            .foregroundStyle(.secondary)
+                                        Rectangle()
+                                            .fill(Color.secondary.opacity(0.2))
+                                            .frame(height: 0.5)
+                                    }
+                                    .frame(height: 80, alignment: .top)
+                                }
+                            }
+                        }
+                    }
+                }
+            }
         }
     }
 

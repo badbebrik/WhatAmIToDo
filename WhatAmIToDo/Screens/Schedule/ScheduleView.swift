@@ -108,6 +108,8 @@ struct ScheduleView: View {
 
                             ForEach(tasks) { task in
                                 TaskBlock(task: task)
+                                    .padding(.leading, 50)
+                                    .padding(.trailing, 20)
                             }
                         }
                     }

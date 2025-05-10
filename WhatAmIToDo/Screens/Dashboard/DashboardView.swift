@@ -104,7 +104,40 @@ struct DashboardView: View {
     }
 
     private struct TodaySection: View {
+        let today: [ScheduledTaskItem]
+        var onOpenSchedule: () -> Void
 
+        var body: some View {
+            VStack(alignment: .leading, spacing: 0) {
+                HStack {
+                    Text("Сегодня")
+                        .font(.headline)
+                    Spacer()
+                    Button("Открыть расписание", action: onOpenSchedule)
+                        .font(.caption)
+                }
+                if today.isEmpty {
+                    Text("На сегодня нет задач")
+                        .font(.subheadline)
+                        .foregroundStyle(.secondary)
+                        .padding(.vertical, 12)
+                } else {
+                    ForEach(today.prefix(3)) { t in
+                        HStack(spacing: 12) {
+                            Circle()
+                                .fill(t.status.color)
+                                .frame(width: 8, height: 8)
+                            VStack(alignment: .leading) {
+                                Text(t.title).font(.subheadline)
+                                Text(t.start, format: .dateTime.hour().minute())
+                                    .font(.caption).foregroundStyle(.secondary)
+                            }
+                            Spacer()
+                        }
+                    }
+                }
+            }
+        }
     }
 
     private struct StatsSection: View {

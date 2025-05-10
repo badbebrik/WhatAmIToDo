@@ -46,7 +46,24 @@ struct DashboardView: View {
     }
 
     private struct MotivationCard: View {
-
+        let text: String
+        let onClose: () -> Void
+        var body: some View {
+            HStack(alignment: .top, spacing: 12) {
+                Image(systemName: "sun.max.fill")
+                    .font(.title2)
+                Text(text)
+                    .font(.callout)
+                Spacer()
+                Button(action: onClose) {
+                    Image(systemName: "xmark")
+                }
+                .buttonStyle(.plain)
+            }
+            .padding()
+            .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 14))
+            .shadow(radius: 4, y: 2)
+        }
     }
 
     private struct UpcomingCarousel: View {

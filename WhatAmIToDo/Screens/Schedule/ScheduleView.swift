@@ -37,7 +37,17 @@ struct ScheduleView: View {
         }()
 
         var body: some View {
-            EmptyView()
+            ScrollView(.horizontal, showsIndicators: false) {
+                HStack(spacing: 12) {
+                    ForEach(range, id: \.self) { date in
+                        dayChip(for: date)
+                            .onTapGesture {
+                                selected = date
+                                onChange(date)
+                            }
+                    }
+                }
+            }
         }
 
         private func dayChip(for date: Date) -> some View {

@@ -24,6 +24,10 @@ struct ScheduledTaskDTO: Codable {
 struct StatsResponse: Codable {
     let tasksPlanned: Int
     let tasksCompleted: Int
+
+    lazy var tasksCompletedRatio: Int = {
+        tasksCompleted / tasksPlanned
+    }()
 }
 
 struct MotivationTodayResponse: Codable {

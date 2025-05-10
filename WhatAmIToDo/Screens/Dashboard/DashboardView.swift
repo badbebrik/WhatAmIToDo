@@ -14,7 +14,55 @@ struct DashboardView: View {
     @Environment(\.colorScheme) private var scheme
 
     var body: some View {
-        EmptyView()
+        ScrollView(.vertical, showsIndicators: false) {
+            VStack(spacing: 24) {
+                greetingHeader
+
+                if let motivation = viewModel.motivation {
+                    MotivationCard(text: motivation) {
+                        withAnimation {
+                            viewModel.motivation = nil
+                        }
+                    }
+                }
+
+                if !viewModel.upcoming.isEmpty {
+                    UpcomingCarousel(tasks: viewModel.upcoming)
+                }
+
+                TodaySection(today: viewModel.today) {
+                    viewModel.openSchedule()
+                }
+
+                if let stats = viewModel.stats {
+                    StatsSection(stats: stats)
+                }
+            }
+            .padding(.horizontal)
+            .padding(.top, 16)
+        }
+        .background(
+            LinearGradient(colors: scheme == .dark
+                           ? [.black, .gray.opacity(0.3)]
+                           : [.white, .blue.opacity(0.08)]
+                           , startPoint: .top, endPoint: .bottom)
+            .ignoresSafeArea()
+        )
+        .navigationTitle("Дашборд")
+        .toolbar {
+            ToolbarItem(placement: .navigationBarTrailing) {
+                Button {
+                    Task {
+                        await viewModel.refreshAll()
+                    }
+                } label: {
+                    Image(systemName: "arrow.clockwise")
+                }
+            }
+        }
+        .task {
+            await viewModel.refreshAll()
+        }
     }
 
     private var greetingHeader: some View {
@@ -27,6 +75,8 @@ struct DashboardView: View {
                     .foregroundStyle(.secondary)
             }
             Spacer()
+            ProgressRing(percent: Double(viewModel.stats?.tasksCompletedRatio ?? 0))
+                .frame(width: 60, height: 60)
         }
     }
 
@@ -75,8 +125,8 @@ struct DashboardView: View {
                     .font(.headline)
                 ScrollView(.horizontal, showsIndicators: false) {
                     HStack(spacing: 12) {
-                        ForEach(tasks) { t in
-                            UpcomingCard(task: t)
+                        ForEach(tasks) { task in
+                            UpcomingCard(task: task)
                         }
                     }
                 }

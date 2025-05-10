@@ -13,6 +13,7 @@ struct ScheduleView: View {
     @Environment(\.colorScheme) private var colorScheme
 
 
+
     var body: some View {
         VStack(spacing: 0) {
             DateCarousel(selected: $viewModel.selectedDate) { date in
@@ -84,12 +85,13 @@ struct ScheduleView: View {
             }
         }
 
+
         private var timelineBody: some View {
             ScrollView {
                 LazyVStack(spacing: 0, pinnedViews: .sectionHeaders) {
                     Section {
                         ZStack(alignment: .topLeading) {
-                            VStack(spacing: 40) {
+                            VStack(spacing: 0) {
                                 ForEach(hours, id: \.self) { hour in
                                     HStack(spacing: 4) {
                                         Text("\(hour, format: .number) :00")
@@ -133,10 +135,13 @@ struct ScheduleView: View {
     private struct TaskBlock: View {
         let task: ScheduledTaskItem
 
+        private let hourHeight: CGFloat = 80
+
         var body: some View {
             GeometryReader { geo in
                 let top = pixelOffset(for: task.start)
-                let height = CGFloat(task.end.timeIntervalSince(task.start) / 3600) * 80
+                let duration = task.end.timeIntervalSince(task.start) / 3600
+                let height = CGFloat(duration) * hourHeight
 
                 VStack(alignment: .leading, spacing: 4) {
                     Text(task.title)

@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct ScheduleView: View {
-    @StateObject private var viewModel: ScheduleViewModel
+    @StateObject var viewModel: ScheduleViewModel
 
     @Environment(\.colorScheme) private var colorScheme
 
@@ -74,9 +74,9 @@ struct ScheduleView: View {
                     Section {
                         ZStack(alignment: .topLeading) {
                             VStack(spacing: 40) {
-                                ForEach(hours, id: \.self) { h in
+                                ForEach(hours, id: \.self) { hour in
                                     HStack(spacing: 4) {
-                                        Text("\(h, format: .number) :00")
+                                        Text("\(hour, format: .number) :00")
                                             .font(.caption2)
                                             .frame(width: 34, alignment: .trailing)
                                             .foregroundStyle(.secondary)
@@ -124,9 +124,9 @@ struct ScheduleView: View {
 
         private func pixelOffset(for date: Date) -> CGFloat {
             let comp = Calendar.current.dateComponents([.hour, .minute], from: date)
-            let h = CGFloat(comp.hour ?? 0)
-            let m = CGFloat(comp.minute ?? 0)
-            return h * 80 + m / 60 * 80
+            let hour = CGFloat(comp.hour ?? 0)
+            let minute = CGFloat(comp.minute ?? 0)
+            return hour * 80 + minute / 60 * 80
         }
     }
 

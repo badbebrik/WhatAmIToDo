@@ -173,14 +173,14 @@ struct DashboardView: View {
                         .foregroundStyle(.secondary)
                         .padding(.vertical, 12)
                 } else {
-                    ForEach(today.prefix(3)) { t in
+                    ForEach(today.prefix(3)) { task in
                         HStack(spacing: 12) {
                             Circle()
-                                .fill(t.status.color)
+                                .fill(task.status.color)
                                 .frame(width: 8, height: 8)
                             VStack(alignment: .leading) {
-                                Text(t.title).font(.subheadline)
-                                Text(t.start, format: .dateTime.hour().minute())
+                                Text(task.title).font(.subheadline)
+                                Text(task.start, format: .dateTime.hour().minute())
                                     .font(.caption).foregroundStyle(.secondary)
                             }
                             Spacer()

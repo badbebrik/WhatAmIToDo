@@ -15,7 +15,7 @@ struct MainTabView: View {
                     Label("Главная", systemImage: "house.fill")
                 }
             
-            Color.blue
+            ScheduleView(viewModel: ScheduleViewModel())
                 .tabItem {
                     Label("Календарь", systemImage: "calendar")
                 }

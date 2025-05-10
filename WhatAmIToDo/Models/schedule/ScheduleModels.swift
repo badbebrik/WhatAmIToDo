@@ -8,7 +8,7 @@
 import Foundation
 import SwiftUI
 
-struct ScheduledTaskItem: Identifiable {
+struct ScheduledTaskItem: Identifiable, Equatable {
     let id: UUID
     let title: String
     let start: Date

@@ -164,12 +164,11 @@ final class ScheduleNetworkManager {
     }
 
     func schedule(for date: Date) async throws -> ScheduleDayResponse {
-        try await request(.getSchedule(date: date.ISO8601Date))
+        try await request(.getSchedule(date: date.ymd))
     }
 
     func schedule(from start: Date, to end: Date) async throws -> [ScheduleDayResponse] {
-        try await request(.getScheduleRange(start: start.ISO8601Date,
-                                            end:   end.ISO8601Date))
+        try await request(.getScheduleRange(start: start.ymd, end: end.ymd))
     }
 
     func upcomingTasks(limit: Int = 5) async throws -> [ScheduledTaskDTO] {

@@ -30,7 +30,19 @@ struct DashboardView: View {
     }
 
     private struct ProgressRing: View {
-
+        let percent: Double
+        var body: some View {
+            ZStack {
+                Circle().stroke(lineWidth: 6)
+                    .opacity(0.15)
+                Circle().trim(from: 0, to: percent)
+                    .stroke(style: StrokeStyle(lineWidth: 6, lineCap: .round))
+                    .rotationEffect(.degrees(-90))
+                    .foregroundColor(.accentColor)
+                Text("\(Int(percent * 100))%")
+                    .font(.caption2.bold())
+            }
+        }
     }
 
     private struct MotivationCard: View {

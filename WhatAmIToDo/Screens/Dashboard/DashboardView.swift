@@ -17,7 +17,16 @@ struct DashboardView: View {
     }
 
     private var greetingHeader: some View {
-
+        HStack(alignment: .center, spacing: 16) {
+            VStack(alignment: .leading, spacing: 4) {
+                Text("Привет, \(viewModel.username)!")
+                    .font(.title3.weight(.semibold))
+                Text(Date(), format: .dateTime.weekday(.wide))
+                    .font(.subheadline)
+                    .foregroundStyle(.secondary)
+            }
+            Spacer()
+        }
     }
 
     private struct ProgressRing: View {
@@ -37,6 +46,6 @@ struct DashboardView: View {
     }
 
     private struct StatsSection: View {
-        
+
     }
 }

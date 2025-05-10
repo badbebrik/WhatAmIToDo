@@ -137,30 +137,39 @@ struct ScheduleView: View {
 
         private let hourHeight: CGFloat = 80
 
-        var body: some View {
-            GeometryReader { geo in
-                let top = pixelOffset(for: task.start)
-                let duration = task.end.timeIntervalSince(task.start) / 3600
-                let height = CGFloat(duration) * hourHeight
+        private var top: CGFloat {
+            let calendar = Calendar.current
+            let comps = calendar.dateComponents([.hour, .minute], from: task.start)
+            let hour = CGFloat(comps.hour ?? 0)
+            let minute = CGFloat(comps.minute ?? 0)
+            return (hour + minute / 60) * hourHeight
+        }
 
-                VStack(alignment: .leading, spacing: 4) {
-                    Text(task.title)
-                        .font(.subheadline.bold())
-                        .foregroundStyle(.white)
-                        .lineLimit(2)
-                    Text("\(task.start.hm) - \(task.end.hm)")
-                        .font(.caption2)
-                        .foregroundStyle(.white.opacity(0.8))
-                }
-                .padding(8)
-                .background(
-                    RoundedRectangle(cornerRadius: 10)
-                        .fill(task.status.color)
-                )
-                .frame(height: height, alignment: .top)
-                .position(x: geo.size.width / 2, y: top + height / 2)
-                .shadow(radius: 2, y: 1)
+        private var height: CGFloat {
+            CGFloat(task.end.timeIntervalSince(task.start) / 3600) * hourHeight
+        }
+
+        var body: some View {
+            VStack(alignment: .leading, spacing: 4) {
+                Text(task.title)
+                    .font(.subheadline.bold())
+                    .foregroundColor(.white)
+                    .lineLimit(2)
+
+                Text("\(task.start.hm) – \(task.end.hm)")
+                    .font(.caption2)
+                    .foregroundColor(.white.opacity(0.85))
             }
+            .padding(8)
+            .frame(maxWidth: .infinity,
+                   alignment: .leading)
+            .frame(height: height, alignment: .top)
+            .background(
+                RoundedRectangle(cornerRadius: 10)
+                    .fill(task.status.color)
+            )
+            .offset(y: top)
+            .shadow(radius: 2, y: 1)
         }
 
         private func pixelOffset(for date: Date) -> CGFloat {

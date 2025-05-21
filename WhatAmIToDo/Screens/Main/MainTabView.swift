@@ -10,21 +10,22 @@ struct MainTabView: View {
 
     var body: some View {
         TabView {
-            MainView()
-                .tabItem {
-                    Label("Главная", systemImage: "house.fill")
-                }
-            
-            ScheduleView(viewModel: ScheduleViewModel())
-                .tabItem {
-                    Label("Календарь", systemImage: "calendar")
-                }
-            
             GoalsView(viewModel: GoalsViewModel())
                 .tabItem {
-                    Label("Задачи", systemImage: "checklist")
+                    Label("Цели", systemImage: "checklist")
+                }
+
+            ScheduleView(viewModel: ScheduleViewModel())
+                .tabItem {
+                    Label("Расписание", systemImage: "calendar")
+                }
+
+            DashboardView(viewModel: DashboardViewModel())
+                .tabItem {
+                    Label("Дашборд", systemImage: "house.fill")
                 }
             
+
             SettingsView()
                 .tabItem {
                     Label("Настройки", systemImage: "gear")

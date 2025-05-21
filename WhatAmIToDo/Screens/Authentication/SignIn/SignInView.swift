@@ -29,17 +29,12 @@ struct SignInView: View {
                 .padding()
                 .overlay(RoundedRectangle(cornerRadius: 8).stroke(Color.gray.opacity(0.5), lineWidth: 1))
 
-            SecureInput(title: "Password", text: $viewModel.password)
-
-            Button("Forgot password?") {
-                viewModel.navigateToForgotPassword()
-            }
-            .frame(maxWidth: .infinity, alignment: .trailing)
+            SecureInput(title: "Пароль", text: $viewModel.password)
 
             Button {
                 viewModel.signInWithEmail()
             } label: {
-                Text("Sign In")
+                Text("Войти")
                     .foregroundStyle(.white)
                     .padding()
                     .frame(maxWidth: .infinity)
@@ -47,24 +42,12 @@ struct SignInView: View {
                     .cornerRadius(8)
             }
 
-            Button {
-                viewModel.signInWithGoogle(from: UIApplication.shared.windows.first!)
-            } label: {
-                HStack {
-                    Image(systemName: "g.circle")
-                    Text("Continue with Google")
-                }
-                .frame(maxWidth: .infinity)
-                .padding().overlay(RoundedRectangle(cornerRadius: 8).stroke())
-            }
-            .padding(.top, 8)
-
             HStack {
-                Text("Don't have an account?")
+                Text("Еще нет аккаунта?")
                 Button {
                     viewModel.navigateToRegister()
                 } label: {
-                    Text("Sign Up")
+                    Text("Зарегистрироваться")
                 }
             }
             .padding(.top, 10)

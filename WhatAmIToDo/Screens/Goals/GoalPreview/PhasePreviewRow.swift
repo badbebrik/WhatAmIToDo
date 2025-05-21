@@ -18,7 +18,7 @@ struct PhasePreviewRow: View {
 
                 Spacer()
 
-                Text("#\(phase.order)")
+                Text("#\(phase.order + 1)")
                     .font(.caption)
                     .foregroundColor(.secondary)
             }

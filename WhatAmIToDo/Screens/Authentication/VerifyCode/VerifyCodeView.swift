@@ -18,12 +18,12 @@ struct VerifyCodeView: View {
     var body: some View {
         VStack(spacing: 20) {
 
-            Text("Enter the code")
+            Text("Введите код")
                 .font(.title)
                 .fontWeight(.bold)
                 .frame(maxWidth: .infinity, alignment: .leading)
 
-            Text("Some text with instructions to restore password")
+            Text("Введите код, присланный на указанную почту")
                 .foregroundColor(.gray)
                 .frame(maxWidth: .infinity, alignment: .leading)
 
@@ -58,16 +58,24 @@ struct VerifyCodeView: View {
             }
             .frame(maxWidth: .infinity, alignment: .center)
 
-            Button {
-                viewModel.navigateToNewPassword()
-            } label: {
-                Text("Verify")
-                    .foregroundColor(.white)
-                    .padding()
-                    .frame(maxWidth: .infinity)
-                    .background(Color.black)
-                    .cornerRadius(8)
+            VStack {
+                Button {
+
+                } label: {
+                    Text("Прислать код еще раз")
+                }
+                Button {
+                    viewModel.navigateToNewPassword()
+                } label: {
+                    Text("Подтвердить")
+                        .foregroundColor(.white)
+                        .padding()
+                        .frame(maxWidth: .infinity)
+                        .background(Color.black)
+                        .cornerRadius(8)
+                }
             }
+
 
         }
         .padding()

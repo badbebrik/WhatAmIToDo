@@ -27,9 +27,8 @@ struct GoalPreviewView: View {
                 ScrollView {
                     GoalHeaderPreview(preview: viewModel.preview)
 
-                    ForEach(viewModel.preview.phases) { phase in
-                        PhasePreviewRow(phase: phase)
-                    }
+                    PhasePreviewRow(phase: viewModel.preview.phases[0])
+
                 }
                 .padding()
 

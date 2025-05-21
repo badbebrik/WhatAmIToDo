@@ -1,23 +1,31 @@
 import SwiftUI
 
 struct MainTabView: View {
+
+    private let rootCoordinator: NavigationCoordinator
+
+    init(rootCoordinator: NavigationCoordinator) {
+        self.rootCoordinator = rootCoordinator
+    }
+
     var body: some View {
         TabView {
-            MainView()
+            GoalsView(viewModel: GoalsViewModel())
                 .tabItem {
-                    Label("Главная", systemImage: "house.fill")
+                    Label("Цели", systemImage: "checklist")
+                }
+
+            ScheduleView(viewModel: ScheduleViewModel())
+                .tabItem {
+                    Label("Расписание", systemImage: "calendar")
+                }
+
+            DashboardView(viewModel: DashboardViewModel())
+                .tabItem {
+                    Label("Дашборд", systemImage: "house.fill")
                 }
             
-            Color.blue
-                .tabItem {
-                    Label("Календарь", systemImage: "calendar")
-                }
-            
-            Color.green
-                .tabItem {
-                    Label("Задачи", systemImage: "checklist")
-                }
-            
+
             SettingsView()
                 .tabItem {
                     Label("Настройки", systemImage: "gear")

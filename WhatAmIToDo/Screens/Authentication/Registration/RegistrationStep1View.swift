@@ -14,14 +14,14 @@ struct RegistrationStep1View: View {
 
     var body: some View {
         VStack(spacing: 20) {
-            Text("Registration")
+            Text("Регистрация")
                 .font(.largeTitle)
                 .fontWeight(.bold)
                 .frame(maxWidth: .infinity, alignment: .leading)
-            Text("Welcome to WhatAmIToDo App! What’s your name?")
+            Text("Добро пожаловать в WhatAmIToDo! Как тебя зовут?")
                 .frame(maxWidth: .infinity, alignment: .leading)
 
-            TextField("Name", text: $name)
+            TextField("Имя", text: $name)
                 .autocorrectionDisabled()
                 .padding()
                 .overlay(RoundedRectangle(cornerRadius: 8).stroke(Color.gray.opacity(0.5), lineWidth: 1))

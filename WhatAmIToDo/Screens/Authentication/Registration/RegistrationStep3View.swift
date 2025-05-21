@@ -21,12 +21,12 @@ struct RegistrationStep3View: View {
     var body: some View {
         VStack(spacing: 20) {
 
-            Text("Registration")
+            Text("Регистрация")
                 .font(.title)
                 .fontWeight(.bold)
                 .frame(maxWidth: .infinity, alignment: .leading)
 
-            Text("Verification code has been sent to \(email). Check your email and confirm the registration with code typed.")
+            Text("Код подтверждения отправлен на \(email). Проверь свой почтовый ящик и подтверди почту.")
                 .foregroundColor(.gray)
                 .frame(maxWidth: .infinity, alignment: .leading)
 
@@ -61,15 +61,22 @@ struct RegistrationStep3View: View {
             }
             .frame(maxWidth: .infinity, alignment: .center)
 
-            Button {
-                onNext()
-            } label: {
-                Text("Verify")
-                    .foregroundColor(.white)
-                    .padding()
-                    .frame(maxWidth: .infinity)
-                    .background(Color.black)
-                    .cornerRadius(8)
+            VStack {
+                Button {
+
+                } label: {
+                    Text("Прислать код еще раз")
+                }
+                Button {
+                    onNext()
+                } label: {
+                    Text("Подтвердить")
+                        .foregroundColor(.white)
+                        .padding()
+                        .frame(maxWidth: .infinity)
+                        .background(Color.black)
+                        .cornerRadius(8)
+                }
             }
 
         }

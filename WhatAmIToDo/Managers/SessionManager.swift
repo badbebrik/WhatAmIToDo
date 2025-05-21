@@ -20,8 +20,14 @@ final class SessionManager: ObservableObject {
     let network = NetworkManager.shared
     let keychain = KeychainManager.shared
 
+    private(set) var accessToken: String?
+    private(set) var refreshToken: String?
+
     private init() {
-        // Если есть refresh-токен, пытаемся обновить сессию
+
+        accessToken  = keychain.getAccessToken()
+        refreshToken = keychain.getRefreshToken()
+
         if let _ = keychain.getRefreshToken() {
             Task { await refresh() }
         }
@@ -56,6 +62,8 @@ final class SessionManager: ObservableObject {
 
         self.user       = response.user
         self.isLoggedIn = true
+        accessToken  = response.accessToken
+        refreshToken = response.refreshToken
     }
 
     /// Refresh-flow: обновляем access, если есть refresh
@@ -64,6 +72,8 @@ final class SessionManager: ObservableObject {
             let rt: String = keychain.getRefreshToken() ?? ""
             let resp: RefreshResponse = try await network.request(.refresh(refreshToken: rt))
             keychain.saveTokens(access: resp.accessToken, refresh: resp.refreshToken)
+            accessToken  = resp.accessToken
+            refreshToken = resp.refreshToken
         } catch {
             await logout()
         }
@@ -71,6 +81,8 @@ final class SessionManager: ObservableObject {
 
     func logout() async {
         keychain.clearTokens()
+        accessToken = nil
+        refreshToken = nil
         self.user       = nil
         self.isLoggedIn = false
     }

@@ -10,7 +10,7 @@ class MainRouter {
 
 extension MainRouter: Routable {
     @MainActor func makeView() -> AnyView {
-        let view = MainTabView()
+        let view = MainTabView(rootCoordinator: rootCoordinator)
         return AnyView(view)
     }
 }

@@ -21,11 +21,11 @@ struct RegistrationStep2View: View {
     var body: some View {
         VStack(spacing: 20) {
             VStack(spacing: 25) {
-                Text("Registration")
+                Text("Регистрация")
                     .font(.largeTitle)
                     .fontWeight(.bold)
                     .frame(maxWidth: .infinity, alignment: .leading)
-                Text("Nice to meet you \(name)! Complete the rest steps to finish the registration.")
+                Text("Приятно познакомиться \(name)! Заверши оставшиеся шаги регистрации.")
                     .frame(maxWidth: .infinity, alignment: .leading)
             }
 
@@ -38,10 +38,10 @@ struct RegistrationStep2View: View {
 
                 ZStack {
                     if isPasswordHidden {
-                        SecureField("New Password", text: $password)
+                        SecureField("Пароль", text: $password)
                             .padding(.trailing, 40)
                     } else {
-                        TextField("New Password", text: $password)
+                        TextField("Пароль", text: $password)
                             .padding(.trailing, 40)
                     }
 
@@ -59,10 +59,10 @@ struct RegistrationStep2View: View {
 
                 ZStack {
                     if isConfirmPasswordHidden {
-                        SecureField("Repeat new password", text: $confirmPassword)
+                        SecureField("Повтор пароля", text: $confirmPassword)
                             .padding(.trailing, 40)
                     } else {
-                        TextField("Repeat new password", text: $confirmPassword)
+                        TextField("Повтор пароля", text: $confirmPassword)
                             .padding(.trailing, 40)
                     }
 

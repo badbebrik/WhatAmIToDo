@@ -3,17 +3,20 @@ import SwiftUI
 struct GoalDetailView: View {
     @StateObject private var viewModel: GoalDetailViewModel
     @Environment(\.colorScheme) private var colorScheme
+    @Environment(\.dismiss) private var dismiss
 
     @State private var showAvailability = false
+    @State private var showDeleteConfirmation = false
+    @State private var isDeleting = false
 
     init(viewModel: GoalDetailViewModel) {
         _viewModel = StateObject(wrappedValue: viewModel)
     }
-    
+
     var body: some View {
         ZStack {
             backgroundGradient
-            
+
             if viewModel.isLoading && viewModel.goal == nil {
                 ProgressView()
                     .scaleEffect(1.5)
@@ -38,10 +41,11 @@ struct GoalDetailView: View {
                             .padding(.horizontal)
                         }
 
-
                         if let phases = goal.phases {
                             PhasesListView(phases: phases)
                         }
+
+                        Spacer().frame(height: 80)
                     }
                     .padding()
                 }
@@ -49,18 +53,67 @@ struct GoalDetailView: View {
                     await viewModel.refresh()
                 }
             }
+
+            if viewModel.goal != nil {
+                VStack {
+                    Spacer()
+                    HStack {
+                        Spacer()
+                        Button {
+                            showDeleteConfirmation = true
+                        } label: {
+                            Image(systemName: "trash.fill")
+                                .font(.title2)
+                                .foregroundColor(.white)
+                                .padding()
+                        }
+                        .background(
+                            Circle()
+                                .fill(Color.red)
+                                .shadow(color: .black.opacity(0.2), radius: 8, x: 0, y: 4)
+                        )
+                        .padding()
+                        .disabled(isDeleting)
+                    }
+                }
+            }
+
+            if isDeleting {
+                Color.black.opacity(0.3)
+                    .ignoresSafeArea()
+                ProgressView("Удаляем…")
+                    .padding()
+                    .background(RoundedRectangle(cornerRadius: 12).fill(Color(.systemBackground)))
+                    .shadow(radius: 10)
+            }
         }
         .navigationBarTitleDisplayMode(.inline)
         .task {
             await viewModel.loadGoal()
         }
         .navigationDestination(isPresented: $showAvailability) {
-                    AvailabilityView(
-                        viewModel: AvailabilityViewModel(goalId: viewModel.goalId)
-                    )
+            AvailabilityView(
+                viewModel: AvailabilityViewModel(goalId: viewModel.goalId)
+            )
+        }
+        .alert("Удалить цель?", isPresented: $showDeleteConfirmation) {
+            Button("Отменить", role: .cancel) { }
+            Button("Удалить", role: .destructive) {
+                Task {
+                    isDeleting = true
+                    do {
+                        try await viewModel.deleteGoal()
+                        dismiss()
+                    } catch {
+                        isDeleting = false
+                    }
                 }
+            }
+        } message: {
+            Text("Это действие невозможно отменить.")
+        }
     }
-    
+
     private var backgroundGradient: some View {
         LinearGradient(
             colors: [
@@ -73,6 +126,7 @@ struct GoalDetailView: View {
         .ignoresSafeArea()
     }
 }
+
 
 struct GoalHeaderView: View {
     let goal: GoalDetailItem

@@ -220,7 +220,6 @@ final class GoalNetworkManager {
                 userInfo: nil
             ))
         }
-        // Цель успешно удалена — возвращаемся без ошибки
     }
     
     // MARK: - Get Goal

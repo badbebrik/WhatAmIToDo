@@ -15,6 +15,8 @@ struct ScheduledTaskItem: Identifiable, Equatable {
     let end:   Date
     let status: TaskStatus
 
+    var isDone: Bool { status == .completed }
+
     init(dto: ScheduledTaskDTO) {
         self.id     = dto.id
         self.title  = dto.title

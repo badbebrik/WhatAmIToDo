@@ -14,6 +14,8 @@ import Foundation
     @Published var today: [ScheduledTaskItem] = []
     @Published var stats: StatsResponse?
 
+    @Published var selected: ScheduledTaskItem?
+
     private let net = ScheduleNetworkManager.shared
 
     func refreshAll() async {
@@ -62,6 +64,20 @@ import Foundation
         do {stats = try await net.stats()}
         catch {
             stats = nil
+        }
+    }
+
+    func toggle(_ task: ScheduledTaskItem, to done: Bool) async {
+        do {
+            try await net.toggleScheduledTask(taskId: task.id, done: done)
+            if let idx = upcoming.firstIndex(where: { $0.id == task.id }) {
+                upcoming[idx].status = done ? .completed : .pending
+            }
+            if let idx = today.firstIndex(where: { $0.id == task.id }) {
+                today[idx].status = done ? .completed : .pending
+            }
+        } catch {
+            print("toggle error", error)
         }
     }
 }

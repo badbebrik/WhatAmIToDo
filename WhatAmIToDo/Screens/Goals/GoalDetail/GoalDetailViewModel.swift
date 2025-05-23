@@ -29,8 +29,4 @@ class GoalDetailViewModel: ObservableObject {
     func refresh() async {
         await loadGoal()
     }
-
-    func deleteGoal() async throws {
-        try await networkManager.deleteGoal(id: goalId)
-    }
-}
+} 

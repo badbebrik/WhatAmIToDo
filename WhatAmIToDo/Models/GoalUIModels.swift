@@ -160,7 +160,7 @@ enum TaskStatus: String {
         switch self {
         case .pending: return .gray
         case .inProgress: return .blue
-        case .completed: return .green
+        case .completed:  return .green.opacity(0.4)
         }
     }
 } 

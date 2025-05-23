@@ -13,7 +13,7 @@ struct ScheduledTaskItem: Identifiable, Equatable {
     let title: String
     let start: Date
     let end:   Date
-    let status: TaskStatus
+    var status: TaskStatus
 
     var isDone: Bool { status == .completed }
 

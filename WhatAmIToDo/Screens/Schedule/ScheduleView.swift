@@ -9,10 +9,9 @@ import SwiftUI
 
 struct ScheduleView: View {
     @StateObject var viewModel: ScheduleViewModel
-
     @Environment(\.colorScheme) private var colorScheme
 
-
+    @State private var selectedTask: ScheduledTaskItem?
 
     var body: some View {
         VStack(spacing: 0) {
@@ -29,7 +28,15 @@ struct ScheduleView: View {
 
             Divider()
 
-            DayTimeline(tasks: viewModel.tasks)
+            DayTimeline(tasks: viewModel.tasks,
+                        onTap: { task in
+                            selectedTask = task
+                        },
+                        onToggle: { task in
+                            Task {
+                                await viewModel.toggle(task, to: !task.isDone)
+                            }
+                        })
                 .overlay(alignment: .topLeading) {
                     if viewModel.isLoading {
                         ProgressView()
@@ -37,42 +44,26 @@ struct ScheduleView: View {
                     }
                 }
                 .animation(.easeInOut, value: viewModel.tasks)
-
-            if let mot = viewModel.motivation {
-                HStack(spacing: 8) {
-                    Image(systemName: "sparkles")
-                    Text(mot)
-                        .font(
-                            .footnote
-                        )
-                        .multilineTextAlignment(.leading)
-                    Spacer()
-                    Button {
-                        withAnimation { viewModel.motivation = nil }
-                    } label: {
-                        Image(systemName: "xmark")
-                            .padding(6)
-                    }
-                    .buttonStyle(.plain)
-                }
-                .padding()
-                .background(
-                    RoundedRectangle(cornerRadius: 12)
-                        .fill(colorScheme == .dark ? Color.white.opacity(0.05) : Color.accentColor.opacity(0.08))
-                        .padding(.horizontal)
-                )
-                .transition(.move(edge: .bottom).combined(with: .opacity))
-            }
         }
         .navigationTitle("Расписание")
         .navigationBarTitleDisplayMode(.inline)
         .task {
             await viewModel.initialLoad()
         }
+        .sheet(item: $selectedTask) { task in
+            TaskOverlay(task: task) { newDone in
+                Task {
+                    await viewModel.toggle(task, to: newDone)
+                    selectedTask = nil
+                }
+            }
+        }
     }
 
     private struct DayTimeline: View {
         let tasks: [ScheduledTaskItem]
+        let onTap: (ScheduledTaskItem) -> Void
+        let onToggle: (ScheduledTaskItem) -> Void
 
         private let hours = Array(0...23)
 
@@ -81,35 +72,38 @@ struct ScheduleView: View {
                 EmptyStateView()
                     .frame(maxWidth: .infinity, maxHeight: .infinity)
             } else {
-                timelineBody
-            }
-        }
-
-
-        private var timelineBody: some View {
-            ScrollView {
-                LazyVStack(spacing: 0, pinnedViews: .sectionHeaders) {
-                    Section {
-                        ZStack(alignment: .topLeading) {
-                            VStack(spacing: 0) {
-                                ForEach(hours, id: \.self) { hour in
-                                    HStack(spacing: 4) {
-                                        Text("\(hour, format: .number) :00")
-                                            .font(.caption2)
-                                            .frame(width: 34, alignment: .trailing)
-                                            .foregroundStyle(.secondary)
-                                        Rectangle()
-                                            .fill(Color.secondary.opacity(0.2))
-                                            .frame(height: 0.5)
+                ScrollView {
+                    LazyVStack(spacing: 0, pinnedViews: .sectionHeaders) {
+                        Section {
+                            ZStack(alignment: .topLeading) {
+                                VStack(spacing: 0) {
+                                    ForEach(hours, id: \.self) { hour in
+                                        HStack(spacing: 4) {
+                                            Text("\(hour, format: .number) :00")
+                                                .font(.caption2)
+                                                .frame(width: 34, alignment: .trailing)
+                                                .foregroundStyle(.secondary)
+                                            Rectangle()
+                                                .fill(Color.secondary.opacity(0.2))
+                                                .frame(height: 0.5)
+                                        }
+                                        .frame(height: 80, alignment: .top)
                                     }
-                                    .frame(height: 80, alignment: .top)
                                 }
-                            }
 
-                            ForEach(tasks) { task in
-                                TaskBlock(task: task)
-                                    .padding(.leading, 50)
-                                    .padding(.trailing, 20)
+                                ForEach(tasks) { task in
+                                    TaskBlock(task: task)
+                                        .padding(.leading, 50)
+                                        .padding(.trailing, 20)
+                                        .onTapGesture {
+                                            onTap(task)
+                                        }
+                                        .contextMenu {
+                                            Button(task.isDone ? "Вернуть в план" : "Завершить задачу") {
+                                                onToggle(task)
+                                            }
+                                        }
+                                }
                             }
                         }
                     }
@@ -173,13 +167,6 @@ struct ScheduleView: View {
             .offset(y: top)
             .shadow(radius: 2, y: 1)
         }
-
-        private func pixelOffset(for date: Date) -> CGFloat {
-            let comp = Calendar.current.dateComponents([.hour, .minute], from: date)
-            let hour = CGFloat(comp.hour ?? 0)
-            let minute = CGFloat(comp.minute ?? 0)
-            return hour * 80 + minute / 60 * 80
-        }
     }
 
     private struct DateCarousel: View {
@@ -230,5 +217,5 @@ struct ScheduleView: View {
             )
         }
     }
-
 }
+

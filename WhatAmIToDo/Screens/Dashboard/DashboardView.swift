@@ -30,9 +30,8 @@ struct DashboardView: View {
                     UpcomingCarousel(tasks: viewModel.upcoming)
                 }
 
-                TodaySection(today: viewModel.today) {
-                    viewModel.openSchedule()
-                }
+                TodaySection(today: viewModel.today,
+                             onTap: { task in viewModel.selected = task })
 
 
                 StatsSection(stats: viewModel.stats ?? StatsResponse(tasksPlanned: 2, tasksCompleted: 5))
@@ -62,6 +61,11 @@ struct DashboardView: View {
         }
         .task {
             await viewModel.refreshAll()
+        }
+        .sheet(item: $viewModel.selected) { task in
+            TaskOverlay(task: task) { newDone in
+                Task { await viewModel.toggle(task, to: newDone) }
+            }
         }
     }
 
@@ -156,40 +160,36 @@ struct DashboardView: View {
 
     private struct TodaySection: View {
         let today: [ScheduledTaskItem]
-        var onOpenSchedule: () -> Void
-
+        var onTap: (ScheduledTaskItem) -> Void
         var body: some View {
-            VStack(alignment: .leading, spacing: 0) {
-                HStack {
-                    Text("Сегодня")
-                        .font(.headline)
-                    Spacer()
-                    Button("Открыть расписание", action: onOpenSchedule)
-                        .font(.caption)
-                }
+            VStack(alignment: .leading) {
+                Text("Сегодня").font(.headline)
                 if today.isEmpty {
                     Text("На сегодня нет задач")
-                        .font(.subheadline)
-                        .foregroundStyle(.secondary)
+                        .font(.subheadline).foregroundColor(.secondary)
                         .padding(.vertical, 12)
                 } else {
                     ForEach(today.prefix(3)) { task in
                         HStack(spacing: 12) {
-                            Circle()
-                                .fill(task.status.color)
+                            Circle().fill(task.status.color)
                                 .frame(width: 8, height: 8)
-                            VStack(alignment: .leading) {
-                                Text(task.title).font(.subheadline)
-                                Text(task.start, format: .dateTime.hour().minute())
-                                    .font(.caption).foregroundStyle(.secondary)
-                            }
+                            Text(task.title)
+                                .strikethrough(task.isDone)
+                                .foregroundColor(task.isDone ? .secondary : .primary)
+                                .font(.subheadline)
                             Spacer()
+                            Text(task.start, format: .dateTime.hour().minute())
+                                .font(.caption).foregroundColor(.secondary)
                         }
+                        .padding(.vertical, 4)
+                        .contentShape(Rectangle())
+                        .onTapGesture { onTap(task) }
                     }
                 }
             }
         }
     }
+
 
     private struct StatsSection: View {
         let stats: StatsResponse

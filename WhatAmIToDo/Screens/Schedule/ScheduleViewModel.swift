@@ -47,7 +47,10 @@ import Foundation
             if let idx = tasks.firstIndex(of: task) {
                 tasks[idx].status = done ? .completed : .pending
             }
-        } catch { }
+            await load(for: selectedDate)
+        } catch {
+            await load(for: selectedDate)
+        }
     }
 
 

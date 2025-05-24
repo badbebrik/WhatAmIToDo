@@ -64,7 +64,10 @@ struct DashboardView: View {
         }
         .sheet(item: $viewModel.selected) { task in
             TaskOverlay(task: task) { newDone in
-                Task { await viewModel.toggle(task, to: newDone) }
+                Task {
+                    await viewModel.toggle(task, to: newDone)
+                    await viewModel.refreshAll()
+                }
             }
         }
     }

@@ -3,15 +3,10 @@ import SwiftUI
 
 @MainActor
 class GoalsViewModel: ObservableObject {
-    private let network: GoalNetworkManager
+    private let network: GoalNetworkManager = .shared
     @Published var goals: [GoalListItem] = []
     @Published var isLoading = false
     @Published var error: Error?
-
-    init(networkManager: GoalNetworkManager = .shared) {
-        print("GoalsViewModel: Инициализация")
-        self.network = networkManager
-    }
 
     // MARK: - Навигация
 

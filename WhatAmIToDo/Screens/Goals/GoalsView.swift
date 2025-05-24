@@ -6,8 +6,16 @@ struct GoalsView: View {
     @State private var isShowingCreate = false
     @State private var selectedGoal: GoalListItem?
 
+    @State private var goalToDelete: GoalListItem?
+    @State private var showDeleteConfirmation = false
+
     init(viewModel: GoalsViewModel) {
         _viewModel = StateObject(wrappedValue: viewModel)
+    }
+
+    private func confirmDelete(_ goal: GoalListItem) {
+        goalToDelete = goal
+        showDeleteConfirmation = true
     }
 
     var body: some View {
@@ -39,10 +47,23 @@ struct GoalsView: View {
         .navigationDestination(item: $selectedGoal) { goal in
             GoalDetailView(viewModel: GoalDetailViewModel(goalId: goal.id))
         }
+        .alert("Удалить цель?", isPresented: $showDeleteConfirmation) {
+            Button("Удалить", role: .destructive) {
+                Task {
+                    if let id = goalToDelete?.id {
+                        await viewModel.deleteGoal(id: id)
+                        await viewModel.loadGoals()
+                    }
+                }
+            }
+            Button("Отмена", role: .cancel) { }
+        } message: {
+            Text("Это действие нельзя отменить")
+        }
+
     }
 
-    // MARK: - Под-view
-
+    
     private var content: some View {
         ZStack {
             backgroundGradient
@@ -55,6 +76,20 @@ struct GoalsView: View {
                         ForEach(viewModel.goals) { goal in
                             GoalCardView(goal: goal)
                                 .onTapGesture { selectedGoal = goal }
+                                .swipeActions(edge: .trailing) {
+                                            Button(role: .destructive) {
+                                                confirmDelete(goal)
+                                            } label: {
+                                                Label("Удалить", systemImage: "trash")
+                                            }
+                                        }
+                                .contextMenu {
+                                        Button(role: .destructive) {
+                                            confirmDelete(goal)
+                                        } label: {
+                                            Label("Удалить", systemImage: "trash")
+                                        }
+                                    }
                                 .transition(.scale.combined(with: .opacity))
                         }
                     }

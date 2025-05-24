@@ -54,4 +54,13 @@ class GoalsViewModel: ObservableObject {
         print("GoalsViewModel: Обновление списка целей")
         await loadGoals()
     }
+
+    @MainActor
+    func deleteGoal(id: UUID) async {
+        do {
+            try await network.deleteGoal(id: id)
+        } catch {
+            print("Ошибка удаления: \(error)")
+        }
+    }
 }

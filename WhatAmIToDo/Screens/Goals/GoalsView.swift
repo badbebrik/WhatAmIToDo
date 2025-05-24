@@ -11,16 +11,16 @@ struct GoalsView: View {
     }
 
     var body: some View {
-        ZStack(alignment: .bottomTrailing) {
-            content
-            addButton
-        }
-        .navigationTitle("Мои цели")
-        .navigationBarTitleDisplayMode(.large)
+            ZStack(alignment: .bottomTrailing) {
+                content
+                addButton
+            }
+            .navigationTitle("Мои цели")
+            .navigationBarTitleDisplayMode(.large)
         .toolbar {
             ToolbarItem(placement: .navigationBarTrailing) {
                 Button {
-                    Task { await viewModel.refresh() }
+                    Task { await viewModel.loadGoals() }
                 } label: {
                     Image(systemName: "arrow.clockwise")
                 }

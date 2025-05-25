@@ -50,6 +50,7 @@ struct GoalDetailView: View {
                 }
             }
         }
+        .navigationTitle("\(viewModel.goal?.title ?? "Цель")")
         .navigationBarTitleDisplayMode(.inline)
         .task {
             await viewModel.loadGoal()

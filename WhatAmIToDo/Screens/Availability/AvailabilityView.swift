@@ -63,7 +63,7 @@ struct AvailabilityView: View {
             Spacer()
         }
         .navigationTitle("Доступность")
-        .navigationBarTitleDisplayMode(.inline)
+        .navigationBarTitleDisplayMode(.large)
         .toolbar {
             ToolbarItem(placement: .navigationBarTrailing) {
                 Button("Сохранить") { Task { await viewModel.save(dismiss) } }

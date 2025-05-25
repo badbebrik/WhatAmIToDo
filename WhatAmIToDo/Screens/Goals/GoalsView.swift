@@ -28,7 +28,7 @@ struct GoalsView: View {
         .toolbar {
             ToolbarItem(placement: .navigationBarTrailing) {
                 Button {
-                    Task { await viewModel.loadGoals() }
+                    Task { await viewModel.refresh() }
                 } label: {
                     Image(systemName: "arrow.clockwise")
                 }
@@ -36,7 +36,7 @@ struct GoalsView: View {
         }
         .onAppear {
             Task {
-                await viewModel.loadGoals()
+                await viewModel.refresh()
             }
         }
         .sheet(isPresented: $isShowingCreate) {
@@ -72,7 +72,7 @@ struct GoalsView: View {
                 ProgressView().scaleEffect(1.5)
             } else {
                 ScrollView {
-                    LazyVStack(spacing: 16) {
+                    VStack(spacing: 16) {
                         ForEach(viewModel.goals) { goal in
                             GoalCardView(goal: goal)
                                 .onTapGesture { selectedGoal = goal }

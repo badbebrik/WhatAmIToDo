@@ -60,6 +60,11 @@ struct GoalsView: View {
         } message: {
             Text("Это действие нельзя отменить")
         }
+        .onChange(of: selectedGoal) { new in
+            if new == nil {
+                Task { await viewModel.refresh() }
+            }
+        }
 
     }
 

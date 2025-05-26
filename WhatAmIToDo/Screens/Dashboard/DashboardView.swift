@@ -13,55 +13,36 @@ struct DashboardView: View {
     @StateObject var viewModel: DashboardViewModel
     @Environment(\.colorScheme) private var scheme
 
+    @Namespace private var animationNS
+
     var body: some View {
         ScrollView(.vertical, showsIndicators: false) {
             VStack(spacing: 24) {
-                greetingHeader
+                greetingBlock
 
-                if let motivation = viewModel.motivation {
-                    MotivationCard(text: motivation) {
-                        withAnimation {
-                            viewModel.motivation = nil
-                        }
-                    }
-                }
+                MotivationSection(text: viewModel.motivation)
 
-                if !viewModel.upcoming.isEmpty {
-                    UpcomingCarousel(tasks: viewModel.upcoming)
-                }
+                UpcomingSection(tasks: viewModel.upcoming)
 
                 TodaySection(today: viewModel.today,
                              onTap: { task in viewModel.selected = task })
 
-
-                StatsSection(stats: viewModel.stats ?? StatsResponse(tasksPlanned: 2, tasksCompleted: 5))
+                EnhancedStatsSection(stats: viewModel.stats)
 
             }
             .padding(.horizontal)
             .padding(.top, 16)
         }
-        .background(
-            LinearGradient(colors: scheme == .dark
-                           ? [.black, .gray.opacity(0.3)]
-                           : [.white, .blue.opacity(0.08)]
-                           , startPoint: .top, endPoint: .bottom)
-            .ignoresSafeArea()
-        )
+        .background(backgroundColor)
         .navigationTitle("Дашборд")
         .toolbar {
             ToolbarItem(placement: .navigationBarTrailing) {
-                Button {
-                    Task {
-                        await viewModel.refreshAll()
-                    }
-                } label: {
+                Button(action: { Task { await viewModel.refreshAll() } }) {
                     Image(systemName: "arrow.clockwise")
                 }
             }
         }
-        .task {
-            await viewModel.refreshAll()
-        }
+        .task { await viewModel.refreshAll() }
         .sheet(item: $viewModel.selected) { task in
             TaskOverlay(task: task) { newDone in
                 Task {
@@ -72,19 +53,33 @@ struct DashboardView: View {
         }
     }
 
-    private var greetingHeader: some View {
-        HStack(alignment: .center, spacing: 16) {
-            VStack(alignment: .leading, spacing: 4) {
-                Text("Привет, \(viewModel.username)!")
-                    .font(.title3.weight(.semibold))
-                Text(Date(), format: .dateTime.weekday(.wide))
-                    .font(.subheadline)
-                    .foregroundStyle(.secondary)
+    private var backgroundColor: Color {
+        scheme == .dark ? Color.black : Color.white
+    }
+
+    private var greetingBlock: some View {
+        ZStack {
+            RoundedRectangle(cornerRadius: 20)
+                .fill(LinearGradient(
+                    gradient: Gradient(colors: [Color.blue.opacity(0.2), Color.blue.opacity(0.05)]),
+                    startPoint: .topLeading,
+                    endPoint: .bottomTrailing))
+                .shadow(color: .black.opacity(0.1), radius: 10, x: 0, y: 5)
+            HStack {
+                VStack(alignment: .leading, spacing: 4) {
+                    Text("Привет, \(viewModel.username)!")
+                        .font(.title2).bold()
+                    Text(Date(), format: .dateTime.weekday(.wide))
+                        .font(.subheadline)
+                        .foregroundStyle(.secondary)
+                }
+                Spacer()
+                ProgressRing(percent: viewModel.stats?.tasksCompletedRatio ?? 0)
+                    .frame(width: 60, height: 60)
             }
-            Spacer()
-            ProgressRing(percent: Double(viewModel.stats?.tasksCompletedRatio ?? 0))
-                .frame(width: 60, height: 60)
+            .padding()
         }
+        .frame(height: 100)
     }
 
     private struct ProgressRing: View {
@@ -103,37 +98,67 @@ struct DashboardView: View {
         }
     }
 
-    private struct MotivationCard: View {
-        let text: String
-        let onClose: () -> Void
+
+    private struct MotivationSection: View {
+        let text: String?
+        @State private var show = false
+
         var body: some View {
-            HStack(alignment: .top, spacing: 12) {
-                Image(systemName: "sun.max.fill")
-                    .font(.title2)
-                Text(text)
-                    .font(.callout)
-                Spacer()
-                Button(action: onClose) {
-                    Image(systemName: "xmark")
+            if let motivation = text {
+                HStack(alignment: .center, spacing: 12) {
+                    AnimatedIcon()
+                    Text(motivation)
+                        .font(.callout).bold()
+                        .multilineTextAlignment(.leading)
+                    Spacer()
+                    Button(action: { }) {
+                        Image(systemName: "xmark.circle.fill")
+                            .font(.title3)
+                    }
+                    .buttonStyle(.plain)
                 }
-                .buttonStyle(.plain)
+                .padding()
+                .background(
+                    RoundedRectangle(cornerRadius: 16)
+                        .fill(Color.orange.opacity(0.1))
+                )
+                .shadow(color: .orange.opacity(0.2), radius: 8, x: 0, y: 4)
+                .scaleEffect(show ? 1 : 0.9)
+                .opacity(show ? 1 : 0)
+                .animation(.spring(response: 0.5, dampingFraction: 0.6), value: show)
+                .onAppear { show = true }
             }
-            .padding()
-            .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 14))
-            .shadow(radius: 4, y: 2)
         }
     }
 
-    private struct UpcomingCarousel: View {
+    private struct AnimatedIcon: View {
+        @State private var animate = false
+        var body: some View {
+            Image(systemName: "sun.max.fill")
+                .font(.largeTitle)
+                .foregroundStyle(
+                    AngularGradient(
+                        gradient: Gradient(colors: [.yellow, .orange, .red, .yellow]),
+                        center: .center
+                    )
+                )
+                .rotationEffect(.degrees(animate ? 360 : 0))
+                .animation(.linear(duration: 8).repeatForever(autoreverses: false), value: animate)
+                .onAppear { animate = true }
+        }
+    }
+
+    private struct UpcomingSection: View {
         let tasks: [ScheduledTaskItem]
         var body: some View {
-            VStack(alignment: .leading, spacing: 8) {
-                Text("Ближайшие задачи")
-                    .font(.headline)
-                ScrollView(.horizontal, showsIndicators: false) {
-                    HStack(spacing: 12) {
-                        ForEach(tasks) { task in
-                            UpcomingCard(task: task)
+            if !tasks.isEmpty {
+                VStack(alignment: .leading, spacing: 8) {
+                    Text("Ближайшие задачи").font(.headline)
+                    ScrollView(.horizontal, showsIndicators: false) {
+                        HStack(spacing: 12) {
+                            ForEach(tasks) { task in
+                                UpcomingCard(task: task)
+                            }
                         }
                     }
                 }
@@ -158,63 +183,127 @@ struct DashboardView: View {
                 RoundedRectangle(cornerRadius: 14)
                     .fill(task.status.color.opacity(0.15))
             )
+            .shadow(color: .black.opacity(0.05), radius: 5, y: 2)
+        }
+    }
+
+    private struct EnhancedStatsSection: View {
+        let stats: StatsResponse?
+        var planned: Int { stats?.tasksPlanned ?? 0 }
+        var completed: Int { stats?.tasksCompleted ?? 0 }
+        var ratio: Double { stats?.tasksCompletedRatio ?? 0 }
+
+        var body: some View {
+            VStack(alignment: .leading, spacing: 12) {
+                Text("Статистика").font(.headline)
+
+                Chart {
+                    BarMark(
+                        x: .value("Категория", "Выполнено"),
+                        y: .value("Количество", completed)
+                    )
+                    .annotation(position: .top) {
+                        Text("\(completed)")
+                            .font(.caption.bold())
+                    }
+                    BarMark(
+                        x: .value("Категория", "Запланировано"),
+                        y: .value("Количество", planned)
+                    )
+                    .annotation(position: .top) {
+                        Text("\(planned)")
+                            .font(.caption.bold())
+                    }
+                }
+                .frame(height: 160)
+                .chartYScale(domain: 0...Double(max(planned, completed) + 2))
+                .chartYAxis(.hidden)
+                .chartXAxisLabel("Задачи")
+
+                HStack {
+                    Text("Завершено: \(Int(ratio * 100))%")
+                        .font(.subheadline.bold())
+                    Spacer()
+                    ProgressCircle(percent: ratio)
+                        .frame(width: 40, height: 40)
+                }
+            }
+            .padding()
+            .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 14))
+            .shadow(radius: 6, y: 3)
+        }
+    }
+
+    private struct ProgressCircle: View {
+        let percent: Double
+        var body: some View {
+            ZStack {
+                Circle().stroke(lineWidth: 5).opacity(0.2)
+                Circle()
+                    .trim(from: 0, to: percent)
+                    .stroke(style: StrokeStyle(lineWidth: 5, lineCap: .round))
+                    .rotationEffect(.degrees(-90))
+                    .foregroundColor(.blue)
+                Text("\(Int(percent * 100))%")
+                    .font(.caption2.bold())
+            }
         }
     }
 
     private struct TodaySection: View {
         let today: [ScheduledTaskItem]
         var onTap: (ScheduledTaskItem) -> Void
+        @State private var showList = false
+
         var body: some View {
             VStack(alignment: .leading) {
                 Text("Сегодня").font(.headline)
                 if today.isEmpty {
                     Text("На сегодня нет задач")
-                        .font(.subheadline).foregroundColor(.secondary)
+                        .font(.subheadline)
+                        .foregroundColor(.secondary)
                         .padding(.vertical, 12)
                 } else {
                     ForEach(today.prefix(3)) { task in
-                        HStack(spacing: 12) {
-                            Circle().fill(task.status.color)
-                                .frame(width: 8, height: 8)
-                            Text(task.title)
-                                .strikethrough(task.isDone)
-                                .foregroundColor(task.isDone ? .secondary : .primary)
-                                .font(.subheadline)
-                            Spacer()
-                            Text(task.start, format: .dateTime.hour().minute())
-                                .font(.caption).foregroundColor(.secondary)
-                        }
-                        .padding(.vertical, 4)
-                        .contentShape(Rectangle())
-                        .onTapGesture { onTap(task) }
+                        TodayCard(task: task)
+                            .onTapGesture { onTap(task) }
+                            .transition(.move(edge: .bottom).combined(with: .opacity))
                     }
                 }
             }
-        }
-    }
-
-
-    private struct StatsSection: View {
-        let stats: StatsResponse
-
-        var body: some View {
-            VStack(alignment: .leading, spacing: 12) {
-                Text("Статистика")
-                    .font(.headline)
-
-                Chart {
-                    BarMark(x: .value("Completed", "Выполнено"),
-                            y: .value("Qty", 3))
-                    .foregroundStyle(.green)
-
-                    BarMark(x: .value("Planned", "Запланировано"),
-                            y: .value("Qty", 5))
-                    .foregroundStyle(.secondary)
-
-                }
-                .frame(height: 140)
-                .chartLegend(.hidden)
+            .onAppear {
+                withAnimation(.easeOut.delay(0.3)) { showList = true }
             }
         }
     }
+
+    private struct TodayCard: View {
+        let task: ScheduledTaskItem
+        @State private var pressed = false
+
+        var body: some View {
+            HStack(spacing: 12) {
+                Circle().fill(task.status.color)
+                    .frame(width: 10, height: 10)
+                VStack(alignment: .leading, spacing: 4) {
+                    Text(task.title)
+                        .font(.subheadline.weight(.semibold))
+                        .strikethrough(task.isDone, color: .primary)
+                    Text(task.start, format: .dateTime.hour().minute())
+                        .font(.caption)
+                        .foregroundColor(.secondary)
+                }
+                Spacer()
+            }
+            .padding()
+            .background(
+                RoundedRectangle(cornerRadius: 16)
+                    .fill(Color.blue.opacity(0.05))
+            )
+            .shadow(color: .black.opacity(0.05), radius: 5, y: 2)
+            .scaleEffect(pressed ? 0.97 : 1)
+            .animation(.spring(), value: pressed)
+        }
+    }
 }
+

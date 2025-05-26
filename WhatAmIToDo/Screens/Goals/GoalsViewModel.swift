@@ -34,7 +34,7 @@ class GoalsViewModel: ObservableObject {
             print("GoalsViewModel: Получен ответ от сервера")
             print("GoalsViewModel: Количество целей: \(resp.goals.count)")
             
-            goals = resp.goals.map { goal in
+            let newGoals = resp.goals.map { goal in
                 print("GoalsViewModel: Преобразование цели в UI модель:")
                 print("GoalsViewModel: ID: \(goal.id)")
                 print("GoalsViewModel: Название: \(goal.title)")
@@ -42,7 +42,9 @@ class GoalsViewModel: ObservableObject {
                 print("GoalsViewModel: Часов в неделю: \(goal.hoursPerWeek ?? 0)")
                 return GoalListItem(from: goal)
             }
-            
+            goals = newGoals
+            print(goals)
+
             print("GoalsViewModel: Все цели успешно преобразованы")
         } catch {
             print("GoalsViewModel: Ошибка при загрузке целей: \(error.localizedDescription)")

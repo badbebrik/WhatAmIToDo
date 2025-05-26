@@ -3,9 +3,6 @@ import SwiftUI
 
 // MARK: - Goal List UI Models
 struct GoalListItem: Identifiable, Hashable {
-    static func == (lhs: GoalListItem, rhs: GoalListItem) -> Bool {
-        lhs.id == rhs.id
-    }
 
     let id: UUID
     let title: String

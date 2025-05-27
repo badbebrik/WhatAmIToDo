@@ -74,7 +74,7 @@ struct DashboardView: View {
                         .foregroundStyle(.secondary)
                 }
                 Spacer()
-                ProgressRing(percent: viewModel.stats?.tasksCompletedRatio ?? 0)
+                ProgressRing(percent: 0.33)
                     .frame(width: 60, height: 60)
             }
             .padding()
@@ -111,11 +111,14 @@ struct DashboardView: View {
                         .font(.callout).bold()
                         .multilineTextAlignment(.leading)
                     Spacer()
-                    Button(action: { }) {
-                        Image(systemName: "xmark.circle.fill")
-                            .font(.title3)
+                    VStack {
+                        Button(action: { }) {
+                            Image(systemName: "xmark.circle.fill")
+                                .font(.title3)
+                        }
+                        .buttonStyle(.plain)
+                        Spacer()
                     }
-                    .buttonStyle(.plain)
                 }
                 .padding()
                 .background(

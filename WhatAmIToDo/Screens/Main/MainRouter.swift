@@ -11,7 +11,10 @@ class MainRouter {
 extension MainRouter: Routable {
     @MainActor func makeView() -> AnyView {
         let view = MainTabView(rootCoordinator: rootCoordinator)
+            .toolbar(.hidden, for: .navigationBar)
+            .navigationBarBackButtonHidden(true)
         return AnyView(view)
+                
     }
 }
 

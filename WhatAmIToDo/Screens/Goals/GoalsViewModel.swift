@@ -3,15 +3,10 @@ import SwiftUI
 
 @MainActor
 class GoalsViewModel: ObservableObject {
-    private let network: GoalNetworkManager
+    private let network: GoalNetworkManager = .shared
     @Published var goals: [GoalListItem] = []
     @Published var isLoading = false
     @Published var error: Error?
-
-    init(networkManager: GoalNetworkManager = .shared) {
-        print("GoalsViewModel: Инициализация")
-        self.network = networkManager
-    }
 
     // MARK: - Навигация
 
@@ -39,7 +34,7 @@ class GoalsViewModel: ObservableObject {
             print("GoalsViewModel: Получен ответ от сервера")
             print("GoalsViewModel: Количество целей: \(resp.goals.count)")
             
-            goals = resp.goals.map { goal in
+            let newGoals = resp.goals.map { goal in
                 print("GoalsViewModel: Преобразование цели в UI модель:")
                 print("GoalsViewModel: ID: \(goal.id)")
                 print("GoalsViewModel: Название: \(goal.title)")
@@ -47,7 +42,9 @@ class GoalsViewModel: ObservableObject {
                 print("GoalsViewModel: Часов в неделю: \(goal.hoursPerWeek ?? 0)")
                 return GoalListItem(from: goal)
             }
-            
+            goals = newGoals
+            print(goals)
+
             print("GoalsViewModel: Все цели успешно преобразованы")
         } catch {
             print("GoalsViewModel: Ошибка при загрузке целей: \(error.localizedDescription)")
@@ -58,5 +55,14 @@ class GoalsViewModel: ObservableObject {
     func refresh() async {
         print("GoalsViewModel: Обновление списка целей")
         await loadGoals()
+    }
+
+    @MainActor
+    func deleteGoal(id: UUID) async {
+        do {
+            try await network.deleteGoal(id: id)
+        } catch {
+            print("Ошибка удаления: \(error)")
+        }
     }
 }

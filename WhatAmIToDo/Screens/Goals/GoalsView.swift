@@ -6,8 +6,17 @@ struct GoalsView: View {
     @State private var isShowingCreate = false
     @State private var selectedGoal: GoalListItem?
 
+    @State private var goalToDelete: GoalListItem?
+    @State private var showDeleteConfirmation = false
+    @State private var animateAddButton = false
+
     init(viewModel: GoalsViewModel) {
         _viewModel = StateObject(wrappedValue: viewModel)
+    }
+
+    private func confirmDelete(_ goal: GoalListItem) {
+        goalToDelete = goal
+        showDeleteConfirmation = true
     }
 
     var body: some View {
@@ -28,7 +37,7 @@ struct GoalsView: View {
         }
         .onAppear {
             Task {
-                await viewModel.loadGoals()
+                await viewModel.refresh()
             }
         }
         .sheet(isPresented: $isShowingCreate) {
@@ -39,9 +48,27 @@ struct GoalsView: View {
         .navigationDestination(item: $selectedGoal) { goal in
             GoalDetailView(viewModel: GoalDetailViewModel(goalId: goal.id))
         }
+        .alert("Удалить цель?", isPresented: $showDeleteConfirmation) {
+            Button("Удалить", role: .destructive) {
+                Task {
+                    if let id = goalToDelete?.id {
+                        await viewModel.deleteGoal(id: id)
+                        await viewModel.loadGoals()
+                    }
+                }
+            }
+            Button("Отмена", role: .cancel) { }
+        } message: {
+            Text("Это действие нельзя отменить")
+        }
+        .onChange(of: selectedGoal) { new in
+            if new == nil {
+                Task { await viewModel.refresh() }
+            }
+        }
+
     }
 
-    // MARK: - Под-view
 
     private var content: some View {
         ZStack {
@@ -51,16 +78,33 @@ struct GoalsView: View {
                 ProgressView().scaleEffect(1.5)
             } else {
                 ScrollView {
-                    LazyVStack(spacing: 16) {
+                    VStack(spacing: 16) {
                         ForEach(viewModel.goals) { goal in
                             GoalCardView(goal: goal)
                                 .onTapGesture { selectedGoal = goal }
+                                .swipeActions(edge: .trailing) {
+                                    Button(role: .destructive) {
+                                        confirmDelete(goal)
+                                    } label: {
+                                        Label("Удалить", systemImage: "trash")
+                                    }
+                                }
+                                .contextMenu {
+                                    Button(role: .destructive) {
+                                        confirmDelete(goal)
+                                    } label: {
+                                        Label("Удалить", systemImage: "trash")
+                                    }
+                                }
                                 .transition(.scale.combined(with: .opacity))
                         }
+                        .animation(.spring(response: 0.5, dampingFraction: 0.8), value: viewModel.goals)
+                        .transition(.move(edge: .bottom).combined(with: .opacity))
+
                     }
                     .padding()
                 }
-                .refreshable { await viewModel.refresh() }
+
             }
         }
     }
@@ -77,22 +121,32 @@ struct GoalsView: View {
     }
 
     private var addButton: some View {
-        Button {
-            isShowingCreate.toggle()
-        } label: {
-            Image(systemName: "plus")
-                .font(.system(size: 24, weight: .bold))
-                .foregroundColor(.white)
-                .padding(20)
-                .background(
-                    Circle()
-                        .fill(Color.blue)
-                        .shadow(color: .black.opacity(0.3), radius: 8, x: 0, y: 4)
-                )
+            Button {
+                isShowingCreate.toggle()
+            } label: {
+                Image(systemName: "plus")
+                    .font(.system(size: 24, weight: .bold))
+                    .foregroundColor(.white)
+                    .padding(20)
+                    .background(
+                        Circle()
+                            .fill(Color.blue)
+                            .shadow(color: .black.opacity(0.3), radius: 8, x: 0, y: 4)
+                    )
+            }
+            .scaleEffect(animateAddButton ? 1.05 : 1)
+            .onAppear {
+                withAnimation(
+                    Animation
+                        .easeInOut(duration: 1)
+                        .repeatForever(autoreverses: true)
+                ) {
+                    animateAddButton = true
+                }
+            }
+            .padding(.trailing, 24)
+            .padding(.bottom, 24)
         }
-        .padding(.trailing, 24)
-        .padding(.bottom, 24)
-    }
 }
 
 struct GoalCardView: View {
@@ -170,6 +224,6 @@ struct GoalCardView: View {
         .clipShape(RoundedRectangle(cornerRadius: 16))
         .shadow(color: Color.black.opacity(0.07), radius: 6, y: 4)
         .opacity(goal.status == .completed ? 0.55 :
-                 goal.status == .paused    ? 0.75 : 1)
+                    goal.status == .paused    ? 0.75 : 1)
     }
 }

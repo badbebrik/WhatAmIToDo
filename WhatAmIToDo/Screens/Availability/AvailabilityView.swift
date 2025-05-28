@@ -10,6 +10,7 @@ import SwiftUI
 struct AvailabilityView: View {
     @StateObject private var viewModel: AvailabilityViewModel
     @Environment(\.dismiss) private var dismiss
+    @State private var showSaveAlert = false
 
     init(viewModel: AvailabilityViewModel) {
         _viewModel = StateObject(wrappedValue: viewModel)
@@ -63,11 +64,24 @@ struct AvailabilityView: View {
             Spacer()
         }
         .navigationTitle("Доступность")
-        .navigationBarTitleDisplayMode(.inline)
+        .navigationBarTitleDisplayMode(.large)
         .toolbar {
+
             ToolbarItem(placement: .navigationBarTrailing) {
-                Button("Сохранить") { Task { await viewModel.save(dismiss) } }
+                Button("Сохранить") {
+                    Task {
+                        await viewModel.save(dismiss)
+                        showSaveAlert = true
+                    }
+                }
             }
+        }
+        .alert("Данные сохранены", isPresented: $showSaveAlert) {
+            Button("OK") {
+                dismiss()
+            }
+        } message: {
+            Text("Ваша доступность успешно обновлена.")
         }
     }
 }
@@ -87,8 +101,8 @@ private struct DayChip: View {
                         isSelected
                         ? Color.accentColor
                         : item.slots.isEmpty
-                          ? Color.secondary.opacity(0.15)
-                          : Color.accentColor.opacity(0.15)
+                        ? Color.secondary.opacity(0.15)
+                        : Color.accentColor.opacity(0.15)
                     )
             )
             .foregroundColor(isSelected ? .white : .primary)

@@ -9,11 +9,11 @@ struct GoalDetailView: View {
     init(viewModel: GoalDetailViewModel) {
         _viewModel = StateObject(wrappedValue: viewModel)
     }
-    
+
     var body: some View {
         ZStack {
             backgroundGradient
-            
+
             if viewModel.isLoading && viewModel.goal == nil {
                 ProgressView()
                     .scaleEffect(1.5)
@@ -50,6 +50,7 @@ struct GoalDetailView: View {
                 }
             }
         }
+        .navigationTitle("\(viewModel.goal?.title ?? "Цель")")
         .navigationBarTitleDisplayMode(.inline)
         .task {
             await viewModel.loadGoal()
@@ -60,7 +61,7 @@ struct GoalDetailView: View {
                     )
                 }
     }
-    
+
     private var backgroundGradient: some View {
         LinearGradient(
             colors: [
@@ -76,38 +77,38 @@ struct GoalDetailView: View {
 
 struct GoalHeaderView: View {
     let goal: GoalDetailItem
-    
+
     var body: some View {
         VStack(alignment: .leading, spacing: 16) {
             HStack {
                 Text(goal.title)
                     .font(.title)
                     .fontWeight(.bold)
-                
+
                 Spacer()
-                
+
                 Image(systemName: goal.status.icon)
                     .foregroundColor(goal.status.color)
                     .font(.title2)
             }
-            
+
             if let description = goal.description {
                 Text(description)
                     .font(.body)
                     .foregroundColor(.secondary)
             }
-            
+
             VStack(spacing: 12) {
                 ProgressView(value: Double(goal.progress), total: 100)
                     .tint(goal.status.color)
-                
+
                 HStack {
                     Label("\(goal.hoursPerWeek) ч/нед", systemImage: "clock")
                         .font(.subheadline)
                         .foregroundColor(.secondary)
-                    
+
                     Spacer()
-                    
+
                     if let estimatedTime = goal.estimatedTime {
                         Label("\(estimatedTime) ч всего", systemImage: "hourglass")
                             .font(.subheadline)
@@ -127,13 +128,13 @@ struct GoalHeaderView: View {
 
 struct PhasesListView: View {
     let phases: [PhaseDetailItem]
-    
+
     var body: some View {
         VStack(alignment: .leading, spacing: 16) {
             Text("Этапы")
                 .font(.title2)
                 .fontWeight(.bold)
-            
+
             ForEach(phases.sorted(by: { $0.order < $1.order })) { phase in
                 PhaseCardView(phase: phase)
             }
@@ -143,26 +144,26 @@ struct PhasesListView: View {
 
 struct PhaseCardView: View {
     let phase: PhaseDetailItem
-    
+
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
             HStack {
                 Text(phase.title)
                     .font(.headline)
-                
+
                 Spacer()
-                
+
                 Circle()
                     .fill(phase.status.color)
                     .frame(width: 12, height: 12)
             }
-            
+
             if let description = phase.description {
                 Text(description)
                     .font(.subheadline)
                     .foregroundColor(.secondary)
             }
-            
+
             if let tasks = phase.tasks {
                 ForEach(tasks) { task in
                     TaskRowView(task: task)
@@ -180,18 +181,18 @@ struct PhaseCardView: View {
 
 struct TaskRowView: View {
     let task: TaskDetailItem
-    
+
     var body: some View {
         HStack {
             Circle()
                 .fill(task.status.color)
                 .frame(width: 8, height: 8)
-            
+
             Text(task.title)
                 .font(.subheadline)
-            
+
             Spacer()
-            
+
             if let estimatedTime = task.estimatedTime {
                 Text("\(estimatedTime) ч")
                     .font(.caption)

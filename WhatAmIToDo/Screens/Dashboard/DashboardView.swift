@@ -27,7 +27,9 @@ struct DashboardView: View {
                 TodaySection(today: viewModel.today,
                              onTap: { task in viewModel.selected = task })
 
-                EnhancedStatsSection(stats: viewModel.stats)
+                if let stats = viewModel.stats {
+                    WeeklyProgressSection(stats: stats)
+                }
 
             }
             .padding(.horizontal)
@@ -74,12 +76,22 @@ struct DashboardView: View {
                         .foregroundStyle(.secondary)
                 }
                 Spacer()
-                ProgressRing(percent: 0.33)
+                ProgressRing(percent: progressOfRing())
                     .frame(width: 60, height: 60)
             }
             .padding()
         }
         .frame(height: 100)
+    }
+
+    func progressOfRing() -> Double {
+        let totalItems = viewModel.today.count
+        guard totalItems > 0 else {
+            return 0
+        }
+        let total = Double(totalItems)
+        let done   = Double(viewModel.today.filter { $0.isDone }.count)
+        return done / total
     }
 
     private struct ProgressRing: View {
@@ -190,52 +202,115 @@ struct DashboardView: View {
         }
     }
 
-    private struct EnhancedStatsSection: View {
-        let stats: StatsResponse?
-        var planned: Int { stats?.tasksPlanned ?? 0 }
-        var completed: Int { stats?.tasksCompleted ?? 0 }
-        var ratio: Double { stats?.tasksCompletedRatio ?? 0 }
+    private struct WeeklyProgressSection: View {
+        let stats: StatsResponse
+
+        @State private var selectedIdx: Int = 6
+        @Namespace private var chipNS
 
         var body: some View {
-            VStack(alignment: .leading, spacing: 12) {
-                Text("Статистика").font(.headline)
+            VStack(alignment: .leading, spacing: 16) {
 
+                Text("Прогресс за неделю")
+                    .font(.title3.weight(.semibold))
+
+                HStack(spacing: 8) {
+                    ForEach(stats.week.indices, id: \.self) { index in
+                        let day = stats.week[index]
+                        DayChip(label: weekdayShort(day.date),
+                                isSelected: index == selectedIdx,
+                                namespace: chipNS)
+                            .onTapGesture {
+                                withAnimation(.spring(response: 0.35,
+                                                      dampingFraction: 0.8)) {
+                                    selectedIdx = index
+                                }
+                            }
+                    }
+                }
+                .padding(.vertical, 4)
+
+
+                let cur = stats.week[selectedIdx]
                 Chart {
                     BarMark(
                         x: .value("Категория", "Выполнено"),
-                        y: .value("Количество", completed)
+                        y: .value("Количество", cur.completed)
                     )
+                    .foregroundStyle(Color.green.opacity(0.6))
                     .annotation(position: .top) {
-                        Text("\(completed)")
-                            .font(.caption.bold())
+                        if cur.completed > 0 {
+                            Text("\(cur.completed)")
+                                .font(.caption.bold())
+                        }
                     }
-                    BarMark(
-                        x: .value("Категория", "Запланировано"),
-                        y: .value("Количество", planned)
-                    )
-                    .annotation(position: .top) {
-                        Text("\(planned)")
-                            .font(.caption.bold())
-                    }
-                }
-                .frame(height: 160)
-                .chartYScale(domain: 0...Double(max(planned, completed) + 2))
-                .chartYAxis(.hidden)
-                .chartXAxisLabel("Задачи")
 
-                HStack {
-                    Text("Завершено: \(Int(ratio * 100))%")
-                        .font(.subheadline.bold())
-                    Spacer()
-                    ProgressCircle(percent: ratio)
-                        .frame(width: 40, height: 40)
+                    BarMark(
+                        x: .value("Категория", "Осталось"),
+                        y: .value("Количество", cur.pending)
+                    )
+                    .foregroundStyle(Color.red.opacity(0.6))
+                    .annotation(position: .top) {
+                        if cur.pending > 0 {
+                            Text("\(cur.pending)")
+                                .font(.caption.bold())
+                        }
+                    }
                 }
+                .chartYAxis(.hidden)
+                .frame(height: 170)
+                .transition(.move(edge: .trailing).combined(with: .opacity))
+                .id(selectedIdx)
+                Text(summary(for: cur))
+                    .font(.footnote)
+                    .foregroundStyle(.secondary)
             }
             .padding()
-            .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 14))
-            .shadow(radius: 6, y: 3)
+            .background(.ultraThinMaterial,
+                        in: RoundedRectangle(cornerRadius: 16, style: .continuous))
+        }
+
+        private func weekdayShort(_ iso: String) -> String {
+            let dateFormatter = ISO8601DateFormatter()
+            dateFormatter.formatOptions = [.withFullDate]
+            guard let date = dateFormatter.date(from: iso) else { return "?" }
+            let formatter = DateFormatter()
+            formatter.locale = .current
+            formatter.dateFormat = "EE"
+            return formatter.string(from: date)
+        }
+
+        private func summary(for day: DayStat) -> String {
+            if day.completed == 0 && day.pending == 0 {
+                return "Задач не было"
+            }
+            return "Выполнено: \(day.completed) · Осталось: \(day.pending)"
+        }
+
+        private struct DayChip: View {
+            let label: String
+            let isSelected: Bool
+            var namespace: Namespace.ID
+
+            var body: some View {
+                Text(label)
+                    .font(.subheadline.weight(.medium))
+                    .padding(.horizontal, 10)
+                    .padding(.vertical, 6)
+                    .background {
+                        if isSelected {
+                            RoundedRectangle(cornerRadius: 10, style: .continuous)
+                                .fill(Color.accentColor.opacity(0.15))
+                                .matchedGeometryEffect(id: "chipBG",
+                                                       in: namespace)
+                        }
+                    }
+                    .foregroundColor(isSelected ? .accentColor : .primary)
+                    .animation(.easeInOut(duration: 0.25), value: isSelected)
+            }
         }
     }
+
 
     private struct ProgressCircle: View {
         let percent: Double

@@ -35,10 +35,10 @@ struct SignInView: View {
                 viewModel.signInWithEmail()
             } label: {
                 Text("Войти")
-                    .foregroundStyle(.white)
+                    .foregroundColor(.white)
                     .padding()
                     .frame(maxWidth: .infinity)
-                    .background(.black)
+                    .background(Color.accentColor)
                     .cornerRadius(8)
             }
 
@@ -56,8 +56,8 @@ struct SignInView: View {
         .padding()
         .overlay { if viewModel.isLoading { ProgressView().scaleEffect(1.4) } }
         .alert(item: $viewModel.alert) {
-                    Alert(title: Text("Error"), message: Text($0.message), dismissButton: .default(Text("OK")))
-                }
+            Alert(title: Text("Error"), message: Text($0.message), dismissButton: .default(Text("OK")))
+        }
     }
 
     private struct SecureInput: View {

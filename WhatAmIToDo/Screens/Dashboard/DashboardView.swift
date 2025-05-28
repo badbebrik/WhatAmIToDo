@@ -335,12 +335,18 @@ struct DashboardView: View {
 
         var body: some View {
             VStack(alignment: .leading) {
-                Text("Сегодня").font(.headline)
+                HStack {
+                    Text("Сегодня").font(.headline)
+                    Spacer()
+                }
                 if today.isEmpty {
-                    Text("На сегодня нет задач")
-                        .font(.subheadline)
-                        .foregroundColor(.secondary)
-                        .padding(.vertical, 12)
+                    HStack {
+                        Text("На сегодня нет задач")
+                            .font(.subheadline)
+                            .foregroundColor(.secondary)
+                            .padding(.vertical, 12)
+                        Spacer()
+                    }
                 } else {
                     ForEach(today.prefix(3)) { task in
                         TodayCard(task: task)

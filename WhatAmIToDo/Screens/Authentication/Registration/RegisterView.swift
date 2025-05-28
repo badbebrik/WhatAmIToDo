@@ -21,7 +21,7 @@ struct RegisterView: View {
                                         { viewModel.onNextStep() }, onBack: { viewModel.onBackStep() })
             case 3:
                 RegistrationStep3View(name: $viewModel.name, email: $viewModel.email, code1: $viewModel.code1, code2: $viewModel.code2, code3: $viewModel.code3, code4:
-                                        $viewModel.code4, onNext: { viewModel.onNextStep() }, onBack: { viewModel.onBackStep() })
+                                        $viewModel.code4, onNext: { viewModel.onNextStep() }, onBack: { viewModel.onBackStep() }, onResend: {})
             default:
                 EmptyView()
             }

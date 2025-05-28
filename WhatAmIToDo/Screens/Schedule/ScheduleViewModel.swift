@@ -12,6 +12,7 @@ import Foundation
     @Published var tasks: [ScheduledTaskItem] = []
     @Published var isLoading = false
     @Published var motivation: String?
+    @Published var selected: ScheduledTaskItem?
 
     private var network = ScheduleNetworkManager.shared
 
@@ -39,4 +40,18 @@ import Foundation
             motivation = nil
         }
     }
+
+    func toggle(_ task: ScheduledTaskItem, to done: Bool) async {
+        do {
+            try await network.toggleScheduledTask(taskId: task.id, done: done)
+            if let idx = tasks.firstIndex(of: task) {
+                tasks[idx].status = done ? .completed : .pending
+            }
+            await load(for: selectedDate)
+        } catch {
+            await load(for: selectedDate)
+        }
+    }
+
+
 }

@@ -201,6 +201,27 @@ final class GoalNetworkManager {
         }
     }
     
+    func deleteGoal(id: UUID) async throws {
+        let endpoint = "/api/goals/\(id)"
+        guard let url = URL(string: baseURL + endpoint) else {
+            throw GoalNetworkError.invalidURL
+        }
+        var urlRequest = URLRequest(url: url)
+        urlRequest.httpMethod = "DELETE"
+        if let token = await SessionManager.shared.accessToken {
+            urlRequest.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
+        }
+        let (_, response) = try await session.data(for: urlRequest)
+        guard let http = response as? HTTPURLResponse,
+              200..<300 ~= http.statusCode else {
+            throw GoalNetworkError.networkError(NSError(
+                domain: "GoalNetworkManager",
+                code: (response as? HTTPURLResponse)?.statusCode ?? -1,
+                userInfo: nil
+            ))
+        }
+    }
+    
     // MARK: - Get Goal
     func getGoal(id: UUID) async throws -> GoalResponse {
         print("GoalNetworkManager: Запрос деталей цели")

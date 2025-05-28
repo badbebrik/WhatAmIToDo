@@ -12,13 +12,21 @@ struct AppNavigationView: View {
     @StateObject var appRouter: AppRouter
     @EnvironmentObject var session: SessionManager
 
+    private var isLoggedInOrHasTokens: Bool {
+        session.isLoggedIn ||
+        (KeychainManager.shared.getAccessToken() != nil && KeychainManager.shared.getRefreshToken() != nil)
+    }
+
     var body: some View {
-        NavigationStack(path: $appRouter.paths) {
-            appRouter.resolveInitialRouter(isLoggedIn: session.isLoggedIn).makeView()
-                .navigationDestination(for: AnyRoutable.self) { router in
-                    router.makeView()
-                    
-                }
+        if isLoggedInOrHasTokens {
+            MainTabView(rootCoordinator: appRouter)
+        } else {
+            NavigationStack(path: $appRouter.paths) {
+                SignInRouter(rootCoordinator: appRouter)
+                    .makeView()
+                    .navigationDestination(for: AnyRoutable.self) { $0.makeView() }
+                    .navigationBarTitleDisplayMode(.inline)
+            }
         }
     }
 }

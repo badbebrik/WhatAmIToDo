@@ -16,23 +16,26 @@ private enum ScheduleEndpoint {
     case upcomingTasks(limit: Int)
     case stats
     case motivationToday
+    case toggleScheduledTask(taskId: UUID, body: ToggleTaskRequest)
 
     var requiresAuth: Bool { true }
 
     var method: String {
         switch self {
         case .getAvailability, .getSchedule, .getScheduleRange,
-             .upcomingTasks, .stats, .motivationToday:
+                .upcomingTasks, .stats, .motivationToday:
             return "GET"
         case .updateAvailability, .autoSchedule:
             return "POST"
+        case .toggleScheduledTask:
+            return "PATCH"
         }
     }
 
     var path: String {
         switch self {
         case .updateAvailability(let id, _),
-             .getAvailability(let id):
+                .getAvailability(let id):
             return "/api/availability/\(id)"
         case .autoSchedule(let id):
             return "/api/availability/\(id)/schedule"
@@ -46,12 +49,19 @@ private enum ScheduleEndpoint {
             return "/api/stats"
         case .motivationToday:
             return "/api/motivation/today"
+        case .toggleScheduledTask(let id, _):
+            return "/api/scheduled_tasks/\(id)"
         }
     }
+
 
     func body() throws -> Data? {
         switch self {
         case .updateAvailability(_, let body):
+            let encoder = JSONEncoder()
+            encoder.keyEncodingStrategy = .convertToSnakeCase
+            return try encoder.encode(body)
+        case .toggleScheduledTask(_, let body):
             let encoder = JSONEncoder()
             encoder.keyEncodingStrategy = .convertToSnakeCase
             return try encoder.encode(body)
@@ -99,7 +109,7 @@ final class ScheduleNetworkManager {
         var req = URLRequest(url: url)
         req.httpMethod = ep.method
         req.setValue("application/json", forHTTPHeaderField: "Content-Type")
-        if let body = try ep.body() { 
+        if let body = try ep.body() {
             req.httpBody = body
             print("[Network] Request to \(ep.path):")
             print("[Network] Method: \(ep.method)")
@@ -182,6 +192,12 @@ final class ScheduleNetworkManager {
     func motivationToday() async throws -> MotivationTodayResponse {
         try await request(.motivationToday)
     }
+
+    func toggleScheduledTask(taskId: UUID, done: Bool) async throws {
+        struct Empty: Decodable {}
+        let reqBody = ToggleTaskRequest(done: done)
+        _ = try await request(.toggleScheduledTask(taskId: taskId, body: reqBody)) as Empty
+    }
 }
 
 
@@ -189,4 +205,8 @@ private extension Date {
     var ISO8601Date: String {
         ISO8601DateFormatter().string(from: self).prefix(10).description
     }
+}
+
+struct ToggleTaskRequest: Codable {
+    let done: Bool
 }

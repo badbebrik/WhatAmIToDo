@@ -10,26 +10,29 @@ struct MainTabView: View {
 
     var body: some View {
         TabView {
-            GoalsView(viewModel: GoalsViewModel())
-                .tabItem {
-                    Label("Цели", systemImage: "checklist")
-                }
+            NavigationStack {
+                GoalsView(viewModel: GoalsViewModel())
+                    .navigationTitle("Мои цели")
+            }
+            .tabItem { Label("Цели", systemImage: "checklist") }
 
-            ScheduleView(viewModel: ScheduleViewModel())
-                .tabItem {
-                    Label("Расписание", systemImage: "calendar")
-                }
+            NavigationStack {
+                ScheduleView(viewModel: ScheduleViewModel())
+                    .navigationTitle("Расписание")
+            }
+            .tabItem { Label("Расписание", systemImage: "calendar") }
 
-            DashboardView(viewModel: DashboardViewModel())
-                .tabItem {
-                    Label("Дашборд", systemImage: "house.fill")
-                }
-            
+            NavigationStack {
+                DashboardView(viewModel: DashboardViewModel())
+                    .navigationTitle("Дашборд")
+            }
+            .tabItem { Label("Дашборд", systemImage: "house.fill") }
 
-            SettingsView()
-                .tabItem {
-                    Label("Настройки", systemImage: "gear")
-                }
+            NavigationStack {
+                SettingsView()
+                    .navigationTitle("Настройки")
+            }
+            .tabItem { Label("Настройки", systemImage: "gear") }
         }
     }
-} 
+}

@@ -55,7 +55,7 @@ enum Endpoint {
         case .verifyCode:           return "/api/auth/verify-email"
         case .refresh:              return "/api/auth/refresh"
         case .logout:               return "/api/auth/logout"
-        case .getMe:                return "/api/auth/me"
+        case .getMe:                return "/api/users/me"
         }
     }
 
